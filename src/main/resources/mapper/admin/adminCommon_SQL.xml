@@ -1,0 +1,493 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="adminCommon">
+     
+   <select id="selectItm0001list" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+		<![CDATA[
+	     	SELECT	IDX
+				 ,	ITEM_CAT
+				 ,	ITEM_TITLE
+				 ,	ITEM_DESC
+				 ,	PRIOR_NEW
+				 ,	PRIOR_CAREER
+				 ,	LENGTH_MIN
+				 ,	LENGTH_MAX
+				 ,	REG_ID
+				 ,	REG_DT
+	     	FROM REC_ITEM_INTRO
+     		ORDER BY IDX
+		]]>
+     </select>
+     
+     <select id="selectItm0001PopDetail" parameterType="java.lang.String" resultType="java.util.HashMap">
+		<![CDATA[
+	     	SELECT	IDX
+				 ,	ITEM_CAT
+				 ,	ITEM_TITLE
+				 ,	ITEM_DESC
+				 ,	PRIOR_NEW
+				 ,	PRIOR_CAREER
+				 ,	LENGTH_MIN
+				 ,	LENGTH_MAX
+				 ,	REG_ID
+				 ,	REG_DT
+	     	FROM REC_ITEM_INTRO
+     	   WHERE 1=1
+     	     AND IDX = #{idx}
+		]]>
+     </select>
+     
+     <insert id="insertItm0001Pop" parameterType="java.util.HashMap" >
+		<![CDATA[
+			INSERT INTO REC_ITEM_INTRO (
+									      ITEM_CAT
+									    , ITEM_TITLE
+									    , ITEM_DESC
+									    , PRIOR_NEW
+									    , PRIOR_CAREER
+									    , LENGTH_MIN
+									    , LENGTH_MAX
+									    , REG_ID
+									    , REG_DT
+			                     )VALUES(
+			                              #{itemCat}  
+			                            , #{itemTitle}  
+			                            , #{itemDesc}  
+			                            , #{priorNew}  
+			                            , #{priorCareer}  
+			                            , #{lengthMin}  
+			                            , #{lengthMax}  
+			                            , #{regId}  
+			                            , GETDATE()  
+			                            )
+		]]>
+     </insert>
+     
+      <update id="updateItm0001Pop" parameterType="java.util.HashMap" >
+		<![CDATA[
+			UPDATE REC_ITEM_INTRO
+			   SET ITEM_CAT      = #{itemCat}    
+				 , ITEM_TITLE    = #{itemTitle}  
+				 , ITEM_DESC     = #{itemDesc}   
+				 , PRIOR_NEW     = #{priorNew}   
+				 , PRIOR_CAREER  = #{priorCareer}
+				 , LENGTH_MIN    = #{lengthMin}  
+				 , LENGTH_MAX    = #{lengthMax}  
+				 , REG_ID        = #{regId}      
+				 , REG_DT        = GETDATE()
+		    WHERE 1=1
+		      AND IDX = #{idx}
+							
+		]]>
+     </update>
+     
+     <delete id="deleteItm0001Pop" parameterType="java.util.HashMap">
+     	<![CDATA[
+     		DELETE 
+     		  FROM REC_ITEM_INTRO
+     		 WHERE 1=1
+     		   AND IDX = #{idx}
+		]]>
+     </delete>
+     
+      <select id="selectItm0002list" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+		<![CDATA[
+	     	SELECT * 
+	     	  FROM (
+	     			SELECT ROW_NUMBER() OVER(ORDER BY IDX DESC)                     AS ROW
+	     			     , IDX
+						 , E_STEP_CODE
+						 , Q_CODE
+						 , (SELECT NAME FROM REC_CODE WHERE SUBSTRING(CODE, 1, 2) IN ('60','61') AND CODE = A.Q_CODE) AS Q_CODE_NM
+						 , Q_INTRO
+						 , Q_DTL
+						 , (SELECT COUNT(IDX) FROM REC_EVAL_ITEM WHERE ITEM_INDEX = A.IDX) AS EVAL_COOUNT
+				      FROM REC_ITEM_INTERVIEW A	
+				     WHERE 1=1
+				       AND E_STEP_CODE = #{SKEY_1}
+		]]>	          
+			     
+		<![CDATA[   
+		  	
+			     	) AS T
+	     	   WHERE 1=1
+	     	     AND ROW BETWEEN #{firstIndex} and #{lastIndex}
+     	]]>	 
+		
+     </select>
+     
+      <select id="selectItm0002Count" parameterType="java.util.HashMap" resultType="java.lang.Integer">
+		<![CDATA[
+	     	SELECT COUNT(*)
+   	          FROM REC_ITEM_INTERVIEW A	
+		     WHERE 1=1
+		       AND E_STEP_CODE = #{SKEY_1}
+		]]>	         
+			     
+		
+		
+     </select>
+     
+     <select id="selectItm0002PopDetail" parameterType="java.lang.String" resultType="java.util.HashMap">
+		<![CDATA[
+	     	SELECT IDX
+				 , E_STEP_CODE
+				 , Q_CODE
+				 , (SELECT NAME FROM REC_CODE WHERE SUBSTRING(CODE, 1, 2) IN ('60','61') AND CODE = A.Q_CODE) AS Q_CODE_NM
+				 , Q_INTRO
+				 , Q_DTL
+	     	FROM REC_ITEM_INTERVIEW A
+	       WHERE 1=1
+     	     AND IDX = #{idx}
+		]]>
+     </select>
+     
+     <insert id="insertItm0002Pop" parameterType="java.util.HashMap" >
+		<![CDATA[
+			INSERT INTO REC_ITEM_INTERVIEW (
+										      E_STEP_CODE
+											, Q_CODE
+											, Q_INTRO
+											, Q_DTL
+			                        )VALUES(
+			                              #{eStepCode}  
+			                            , #{qCode}  
+			                            , #{qIntro}  
+			                            , #{qDtl}  
+			                            )
+		]]>
+     </insert>
+     
+      <update id="updateItm0002Pop" parameterType="java.util.HashMap" >
+		<![CDATA[
+			UPDATE REC_ITEM_INTERVIEW
+			   SET E_STEP_CODE =  #{eStepCode}
+				 , Q_CODE      =  #{qCode}    
+				 , Q_INTRO     =  #{qIntro}   
+				 , Q_DTL       =  #{qDtl}     
+		    WHERE 1=1
+		      AND IDX = #{idx}
+							
+		]]>
+     </update>
+     
+     <delete id="deleteItm0002Pop" parameterType="java.util.HashMap">
+     	<![CDATA[
+     		DELETE 
+     		  FROM REC_ITEM_INTERVIEW
+     		 WHERE 1=1
+     		   AND IDX = #{idx}
+		]]>
+     </delete>
+     
+     <select id="getMenuList" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+		<![CDATA[
+	     	SELECT CAT_CODE
+	     	     , (SELECT NAME FROM REC_CODE WHERE SUBSTRING(CODE, 1, 2) = '91' AND CODE = A.CAT_CODE) AS CAT_CODE_NM
+				 , CAR_AUTH_YN
+				 , ADM_AUTH_YN
+				 , DISPLAY_YN
+	     	FROM REC_MENU_INFO A	
+     		ORDER BY CAT_CODE
+		]]>
+     </select>
+     
+      <select id="selectAdminMenuDetail" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+		<![CDATA[
+	     	SELECT CAT_CODE
+	     	     , (SELECT NAME FROM REC_CODE WHERE SUBSTRING(CODE, 1, 2) = '91' AND CODE = A.CAT_CODE) AS CAT_CODE_NM
+				 , CAR_AUTH_YN
+				 , ADM_AUTH_YN
+				 , DISPLAY_YN
+	     	FROM REC_MENU_INFO A
+	       WHERE 1=1
+	         AND CAT_CODE = #{catCode}
+     		ORDER BY CAT_CODE
+		]]>
+     </select>
+     
+     <select id="getMenuAddCatCode" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+		<![CDATA[
+	     	SELECT FORMAT(CONVERT(INT, ISNULL(MAX(RIGHT(CAT_CODE,3)), 0)) + 1, '91000') AS catCode
+		      FROM REC_MENU_INFO
+		]]>
+     </select>
+     
+     
+     <update id="mergeMenuInfo" parameterType="java.util.HashMap">
+     	<![CDATA[
+     		MERGE REC_MENU_INFO RMI
+     		USING (select 'X' as DUAL) T
+     		   ON (RMI.CAT_CODE = #{catCode})
+     		WHEN MATCHED THEN
+	     		UPDATE 
+	     			SET CAT_CODE     = #{catCode}
+					  ,	CAR_AUTH_YN  = #{carAuthYn}
+					  ,	ADM_AUTH_YN  = #{admAuthYn}
+					  ,	DISPLAY_YN   = #{displayYn}
+
+			WHEN NOT MATCHED THEN
+	     		INSERT (
+		     		     CAT_CODE   
+					   , CAR_AUTH_YN
+					   , ADM_AUTH_YN
+					   , DISPLAY_YN 
+				) VALUES (
+					 #{catCode}
+					, #{carAuthYn}
+					, #{admAuthYn}
+					, #{displayYn}
+					
+				);
+     	]]>
+     </update>
+     
+     <update id="mergeMenuInfoCodeByGroup" parameterType="java.util.HashMap">
+     	<![CDATA[
+     		MERGE REC_CODE RC
+     		USING (select 'X' as DUAL) T
+     		   ON (RC.CODE = #{catCode})
+     		WHEN MATCHED THEN
+	     		UPDATE 
+	     			SET CODE         = #{catCode}
+					  ,	NAME         = #{catNm}
+					  ,	EXPR         = CONCAT('대메뉴 - ',#{catNm})
+					  ,	DISPLAY_YN   = 'Y'
+
+			WHEN NOT MATCHED THEN
+	     		INSERT (
+		     		     CODE   
+					   , NAME
+					   , EXPR
+					   , DISPLAY_YN 
+				) VALUES (
+					  #{catCode}                
+					, #{catNm}                  
+					, CONCAT('대메뉴 - ',#{catNm}) 
+					, 'Y'                       
+					
+				);
+     	]]>
+     </update>
+     
+      <delete id="deleteMenu" parameterType="java.util.HashMap">
+     	<![CDATA[
+     		DELETE 
+     		  FROM REC_MENU_INFO
+     		 WHERE 1=1
+     		   AND CAT_CODE = #{catCode}
+		]]>
+     </delete>
+      <delete id="deleteMenuCodeByGroup" parameterType="java.util.HashMap">
+     	<![CDATA[
+     		DELETE 
+     		  FROM REC_CODE
+     		 WHERE 1=1
+     		   AND CODE = #{catCode}
+		]]>
+     </delete>
+     
+     <select id="selectCom0101List" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+		<![CDATA[
+	     	SELECT * 
+	     	  FROM (
+	     			SELECT ROW_NUMBER() OVER(ORDER BY M_CODE DESC)                     AS ROW
+	     			     , M_CODE
+						 , M_NAME
+						 , M_GUBUN
+						 , M_CATEGORY
+						 , (SELECT NAME FROM REC_CODE WHERE SUBSTRING(CODE, 1, 2) = '15' AND CODE = A.M_CATEGORY) AS M_CATEGORY_NM
+				      FROM REC_MAJOR A	
+				     WHERE 1=1
+		]]>	       
+			     	<if test="searchType eq '1'.toString() and SKEY_1 != '' and SKEY_1 != null">
+			     		 AND M_CODE = #{SKEY_1}
+			     	</if>
+			     	<if test="searchType eq '2'.toString() and SKEY_1 != '' and SKEY_1 != null">
+			     		AND M_NAME LIKE CONCAT('%',#{SKEY_1},'%') 
+			     	</if>
+			     	<if test="gubunType1 != '' and gubunType1 != null">
+			     		AND M_GUBUN = #{gubunType1} 
+			     	</if>
+			     	<if test="gubunType2 != '' and gubunType2 != null">
+			     		AND M_CATEGORY = #{gubunType2} 
+			     	</if>
+		<![CDATA[   
+		  	
+			     	) AS T
+	     	   WHERE 1=1
+	     	     AND ROW BETWEEN #{firstIndex} and #{lastIndex}
+     	]]>	     
+     </select>
+     
+     <select id="selectCom0101Count" parameterType="java.util.HashMap" resultType="java.lang.Integer">
+		<![CDATA[
+     		SELECT COUNT(*)
+		      FROM REC_MAJOR
+		     WHERE 1=1
+	    ]]>
+	    	<if test="searchType eq '1'.toString() and SKEY_1 != '' and SKEY_1 != null">
+	     		 AND M_CODE = #{SKEY_1}
+	     	</if>
+	     	<if test="searchType eq '2'.toString() and SKEY_1 != '' and SKEY_1 != null">
+	     		AND M_NAME LIKE CONCAT('%',#{SKEY_1},'%') 
+	     	</if>
+	     	<if test="gubunType1 != '' and gubunType1 != null">
+	     		AND M_GUBUN = #{gubunType1} 
+	     	</if>
+	     	<if test="gubunType2 != '' and gubunType2 != null">
+	     		AND M_CATEGORY = #{gubunType2} 
+	     	</if>
+     </select>
+     
+     <select id="selectCom0101Datail" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+     	<![CDATA[
+     		SELECT ROW_NUMBER() OVER(ORDER BY M_CODE DESC)                     AS ROW
+   			     , M_CODE
+				 , M_NAME
+				 , M_GUBUN
+				 , M_CATEGORY
+				 , (SELECT NAME FROM REC_CODE WHERE SUBSTRING(CODE, 1, 2) = '15' AND CODE = A.M_CATEGORY) AS M_CATEGORY_NM
+		      FROM REC_MAJOR A	
+		     WHERE 1=1
+     		   AND M_CODE = #{mCode}
+     	]]>
+     </select>
+     
+     <delete id="deleteCom0101" parameterType="java.util.HashMap">
+	     <![CDATA[
+	     	DELETE
+	     	  FROM REC_MAJOR
+	     	 WHERE 1=1
+	     	   AND M_CODE = #{mCode}
+	     ]]>	    
+     </delete>
+     <insert id="insertCom0101" parameterType="java.util.HashMap">
+	     <![CDATA[
+	     	INSERT INTO REC_MAJOR(
+	     	                       M_CODE        
+								 , M_NAME        
+								 , M_GUBUN       
+								 , M_CATEGORY    
+	     	              )VALUES(
+	     	              		   #{mCode}       
+								 , #{mName}       
+								 , #{mGubun}      
+								 , #{mCategory}   	
+	     	                     )
+	     ]]>	                     
+     </insert>
+     <update id="updateCom0101" parameterType="java.util.HashMap">
+	     <![CDATA[
+	     	UPDATE REC_MAJOR
+	     	   SET M_CODE     = #{mCode}            
+			     , M_NAME     = #{mName}       
+			     , M_GUBUN    = #{mGubun}      
+			     , M_CATEGORY = #{mCategory}
+			WHERE 1=1
+			  AND M_CODE = #{mCode} 
+		 ]]>	  
+     </update>
+     
+     <select id="selectItm0101list" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+     	<![CDATA[
+     		SELECT IDX
+   			     , E_STEP_CODE
+				 , ITEM_INDEX
+				 , (SELECT ITEM_TITLE FROM REC_ITEM_INTRO WHERE IDX = A.ITEM_INDEX) AS ITEM_TITLE
+				 , E_ITEM
+				 , E_CONTENT
+		      FROM REC_EVAL_ITEM A	
+		     WHERE 1=1
+     		   AND E_STEP_CODE = '51010'
+     		 ORDER BY ITEM_INDEX
+     	]]>
+     </select>
+     
+     <select id="selectItm0101PopDetail" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+     	<![CDATA[
+     		SELECT IDX
+   			     , E_STEP_CODE
+				 , ITEM_INDEX
+				 , (SELECT ITEM_TITLE FROM REC_ITEM_INTRO WHERE IDX = A.ITEM_INDEX) AS ITEM_TITLE
+				 , E_ITEM
+				 , E_CONTENT
+		      FROM REC_EVAL_ITEM A	
+		     WHERE 1=1
+     		   AND IDX = #{idx}
+     	]]>
+     </select>
+     
+     
+     
+     <select id="selectItm0102PopItemList" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+     	<![CDATA[
+     		SELECT IDX
+   			     , E_STEP_CODE
+				 , ITEM_INDEX
+				 , E_ITEM
+				 , E_CONTENT
+		      FROM REC_EVAL_ITEM A	
+		     WHERE 1=1
+     		   AND ITEM_INDEX = #{idx}
+     	]]>
+     </select>
+     
+     
+     <update id="mergeEvalItmProcess" parameterType="java.util.HashMap">
+     	<![CDATA[
+     		MERGE REC_EVAL_ITEM REI
+     		USING (select 'X' as DUAL) T
+     		   ON (REI.IDX = #{idx})
+     		WHEN MATCHED THEN
+	     		UPDATE 
+	     			SET E_STEP_CODE     = #{eStepCode}
+					  ,	ITEM_INDEX      = #{itemIndex}
+					  ,	E_ITEM          = #{eItem}
+					  ,	E_CONTENT       = #{eContent}
+
+			WHEN NOT MATCHED THEN
+	     		INSERT (
+		     		     E_STEP_CODE
+					   , ITEM_INDEX 
+					   , E_ITEM     
+					   , E_CONTENT  
+				) VALUES (
+					  #{eStepCode}
+					, #{itemIndex}
+					, #{eItem}    
+					, #{eContent} 
+					
+				);
+     	]]>
+     </update>
+     
+     <delete id="evalItmDelete" parameterType="java.util.HashMap">
+     	<![CDATA[
+	     	DELETE 
+	     	  FROM REC_EVAL_ITEM
+	     	 WHERE 1=1
+	     	   AND IDX = #{idx}
+     	]]>   
+     </delete>
+     
+     <select id="selectPopupManageList" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+     
+     </select>
+     <select id="selectPopupManageCount" parameterType="java.util.HashMap" resultType="java.lang.Integer">
+     
+     </select>
+     <select id="selectPpupManageForm" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+     
+     </select>
+     <delete id="deletePopup" parameterType="java.util.HashMap">
+     
+     </delete>
+     <insert id="insertPopupManageProcess" parameterType="java.util.HashMap">
+     
+     </insert>
+     <update id="updatePopupManageProcess" parameterType="java.util.HashMap">
+     
+     </update>
+     
+</mapper>

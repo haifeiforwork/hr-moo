@@ -1,0 +1,96 @@
+<?xml version="1.0" ?>
+<sapInterface>
+
+    <!-- 개발 Server -->
+    <connection name="EP_MEU" client="300" user="wmeai" passwd="wmeai123" lang="KO" 
+    mshost="10.1.5.16" sysnr="00" maxcnt="100" r3name="MEQ" 
+    group="SPACE" pool_capacity="100" peak_limit="100" />
+
+    <!-- 운영 Server -->
+    <!-- <connection name="EP_MEU" client="300" user="wmeai" passwd="wmeai123" lang="KO" ashost="203.247.151.22" sysnr="00" maxcnt="100" r3name="MEQ" group="SPACE" pool_capacity="100" peak_limit="100" /> -->
+    
+    
+    <!-- 인사정보 조회 -->
+    <function name="ZHR_IF_EDU_INSA">
+        <!-- Parameter 설정 -->
+        <!-- 실행일자 -->
+        <import name="I_DATUM" title="I_DATUM" type="CHAR" length="8" />
+        
+        <!-- 실행결과(S:정상, E:오류) -->
+        <export name="E_RESULT" title="E_RESULT" type="CHAR" length="1" />
+        <!-- 결과TEXT ( 정상 메시지 or 오류 메시지 )  -->
+        <export name="E_MESSAGE" title="E_MESSAGE" type="CHAR" length="30" />
+        
+        <outputTable name="ET_RESULT">
+        	<!-- 이름 -->
+        	<field name="ENAME" title="ENAME" type="CHAR" length="40" />
+        	<!-- 사번 -->
+        	<field name="PERNR" title="PERNR" type="CHAR" length="8" />
+        	<!-- 이메일 -->
+        	<field name="EMAIL" title="EMAIL" type="CHAR" length="241" />
+        	<!-- SAP ID -->
+        	<field name="SAPID" title="SAPID" type="CHAR" length="30" />
+        	<!-- 휴대폰번호 -->
+        	<field name="CELLPHONE" title="CELLPHONE" type="CHAR" length="30" />
+        	<!-- 회사전화번호 -->
+        	<field name="COMPPHONE" title="COMPPHONE" type="CHAR" length="30" />
+           	<!-- 사원하위그룹명 -->
+        	<field name="PERTEXT" title="PERTEXT" type="CHAR" length="20" />
+        	<!-- 사원하위그룹코드 -->
+        	<field name="PERSK" title="PERSK" type="CHAR" length="2" />
+        	<!-- 직급명 -->
+        	<field name="TRFTEXT" title="TRFTEXT" type="CHAR" length="20" />
+        	<!-- 직급코드 -->
+        	<field name="TRFGR" title="TRFGR" type="CHAR" length="8" />
+        	<!-- 직무명 -->
+        	<field name="STETEXT" title="STETEXT" type="CHAR" length="40" />
+        	<!-- 직무코드 -->
+        	<field name="STELL" title="STELL" type="CHAR" length="8" />
+        	<!-- 직군명 -->
+        	<field name="JIKTEXT" title="JIKTEXT" type="CHAR" length="40" />
+        	<!-- 직군코드 -->
+        	<field name="JIKGUN" title="JIKGUN" type="CHAR" length="8" />
+        	<!-- 직책명 -->
+        	<field name="COTXT" title="COTXT" type="CHAR" length="30" />
+        	<!-- 직책코드 -->
+        	<field name="ZZJIK" title="ZZJIK" type="CHAR" length="2" />
+        	<!-- 참조사원번호(이전1건) -->
+        	<!-- <field name="RPERNR" title="RPERNR" type="CHAR" length="8" /> -->
+        	<!-- 부서명 -->
+        	<field name="ORGTX" title="ORGTX" type="CHAR" length="40" />
+        	<!-- 부서코드 -->
+        	<field name="ORGEH" title="ORGEH" type="CHAR" length="8" />
+        	<!-- 사업장 -->
+        	<field name="BTEXT" title="BTEXT" type="CHAR" length="15" />
+        	<!-- 소속회사 -->
+        	<field name="BUTXT" title="BUTXT" type="CHAR" length="25" />
+        	<!-- 주소 -->
+        	<field name="ADDRESS" title="ADDRESS" type="CHAR" length="100" />
+        	<!-- 승격(예정)일 -->
+        	<field name="PROMOTEDATE" title="PROMOTEDATE" type="CHAR" length="8" />
+        	<!-- 연차 -->
+        	<field name="PROMOTEYEAR" title="PROMOTEYEAR" type="CHAR" length="10" />
+        	<!-- 세부직무명(사업장_직무명_직책명,직책명은 직책자만 추가) -->
+        	<field name="DETAILSTELL" title="DETAILSTELL" type="CHAR" length="80" />
+        	
+        </outputTable>
+    </function>
+    
+    <!-- 조직정보 조회 -->
+    <function name="ZHR_IF_EDU_ORG">
+        <import name="I_DATUM" title="I_DATUM" type="CHAR" length="8" />
+        
+        <export name="E_RESULT" title="E_RESULT" type="CHAR" length="1" />
+        <export name="E_MESSAGE" title="E_MESSAGE" type="CHAR" length="30" />
+        
+        <outputTable name="ET_RESULT">
+        	<field name="OBJID" title="OBJID" type="CHAR" length="8" />
+        	<field name="STEXT" title="STEXT" type="CHAR" length="40" />
+        	<field name="HIGHOBJ" title="HIGHOBJ" type="CHAR" length="8" />
+        	<field name="PERNR" title="PERNR" type="CHAR" length="8" />
+        	<field name="LOCTEXT" title="LOCTEXT" type="CHAR" length="15" />
+        	<field name="LOCAT" title="LOCAT" type="CHAR" length="1" />
+        </outputTable>
+    </function>
+    
+</sapInterface>

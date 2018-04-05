@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="adminFaq">
+	
+	<select id="selectFaq0001List" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+		<![CDATA[
+	     	SELECT * 
+	     	  FROM (
+	     			SELECT ROW_NUMBER() OVER(ORDER BY IDX DESC) AS ROW
+	     			     , IDX
+						 , TITLE
+						 , CONTENT_Q
+						 , ATT_FILE
+						 , HIT_CNT
+						 , DEL_YN
+						 , REG_ID
+						 , REG_NAME
+						 , REG_DT
+						 , MOD_ID
+						 , MOD_NAME
+						 , MOD_DT
+				      FROM REC_FAQ
+				     WHERE 1=1
+		]]>	       
+			     	<if test="searchType eq '1'.toString() and SKEY_1 != '' and SKEY_1 != null">
+			     		AND TITLE like  CONCAT('%',#{SKEY_1},'%')
+			     	</if>
+			     	<if test="searchType eq '2'.toString() and SKEY_1 != '' and SKEY_1 != null">
+			     		AND REG_NAME like  CONCAT('%',#{SKEY_1},'%')
+			     	</if>
+			     	<if test="searchType eq '3'.toString() and SKEY_1 != '' and SKEY_1 != null">
+			     		AND CONTENT_Q like  CONCAT('%',#{SKEY_1},'%')
+			     	</if>
+		<![CDATA[   
+		  	
+			     	) AS T
+	     	   WHERE 1=1
+	     	     AND ROW BETWEEN #{firstIndex} and #{lastIndex}
+     	]]>	     
+     </select>
+     
+	<select id="selectFaq0001Count" parameterType="java.util.HashMap" resultType="java.lang.Integer">
+		<![CDATA[
+     		SELECT COUNT(*)
+		      FROM REC_FAQ
+		     WHERE 1=1
+	    ]]>
+	    
+	     	<if test="searchType eq '1'.toString() and SKEY_1 != '' and SKEY_1 != null">
+	     		AND TITLE like  CONCAT('%',#{SKEY_1},'%')
+	     	</if>
+	     	<if test="searchType eq '2'.toString() and SKEY_1 != '' and SKEY_1 != null">
+	     		AND REG_NAME like  CONCAT('%',#{SKEY_1},'%')
+	     	</if>
+	     	<if test="searchType eq '3'.toString() and SKEY_1 != '' and SKEY_1 != null">
+	     		AND CONTENT_Q like  CONCAT('%',#{SKEY_1},'%')
+	     	</if>
+     </select>
+     
+     <select id="selectFaq0002Detail" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+     	<![CDATA[
+     		SELECT IDX
+				 , TITLE
+				 , CONTENT_Q
+				 , ATT_FILE
+				 , HIT_CNT
+				 , DEL_YN
+				 , REG_ID
+				 , REG_NAME
+				 , REG_DT
+				 , MOD_ID
+				 , MOD_NAME
+				 , MOD_DT
+		      FROM REC_FAQ
+		     WHERE 1=1
+     		   AND IDX = #{idx}
+     	]]>
+     </select>
+     
+     <insert id="insertFaq0002" parameterType="com.moorim.hr.admin.vo.FaqVO" >
+     	INSERT INTO REC_FAQ(
+     	                     TITLE
+                           , CONTENT_Q
+                           , ATT_FILE
+                           , HIT_CNT
+                           , DEL_YN
+                           , REG_ID
+                           , REG_NAME
+                           , REG_DT
+                           , MOD_ID
+                           , MOD_NAME
+                           , MOD_DT
+                    )VALUES(
+                              #{title}    
+							, #{contentQ}
+							, #{fileinfo}
+							, 0 
+							, #{delYn}  
+							, #{regId}  
+							, #{regName}
+							, CONVERT(VARCHAR(10), #{regDt} + ':00:00')   
+							, #{modId}  
+							, #{modName}
+							, CONVERT(VARCHAR(10), #{regDt} + ':00:00') 
+                           )	
+     </insert>
+     
+     <delete id="deleteFaq0001" parameterType="java.util.HashMap" >
+     	DELETE 
+     	  FROM REC_FAQ 
+     	 WHERE 1=1 
+     	   AND IDX = #{idx}
+     </delete>
+     
+     <update id="updateFaq0002" parameterType="java.util.HashMap" >
+     	UPDATE REC_FAQ
+		   SET TITLE     = #{title}   
+		     , CONTENT_Q = #{contentQ}
+		     , DEL_YN    = #{delYn}
+		     , ATT_FILE  = #{fileinfo}
+		     , REG_ID    = #{regId}   
+		     , REG_NAME  = #{regName} 
+		     , REG_DT    = CONVERT(VARCHAR(10), #{regDt} + ':00:00')   
+		     , MOD_ID    = #{modId}   
+		     , MOD_NAME  = #{modName} 
+		     , MOD_DT    = GETDATE()   
+		 WHERE 1=1
+		   AND IDX = #{idx}
+     </update>
+     
+     
+     
+     
+     
+     <select id="selectFaq0001ListEasy" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+		<![CDATA[
+	     	SELECT * 
+	     	  FROM (
+	     			SELECT ROW_NUMBER() OVER(ORDER BY IDX DESC) AS row
+	     			     , IDX                                  AS idx       
+						 , TITLE                                AS title     
+						 , CONTENT_Q                            AS contentQ 
+						 , ATT_FILE                             AS attFile  
+						 , HIT_CNT                              AS hitCnt   
+						 , DEL_YN                               AS delYn    
+						 , REG_ID                               AS regId    
+						 , REG_NAME                             AS regName  
+						 , REPLACE(CONVERT(VARCHAR(30),REG_DT,111),'/','.')                               AS regDt    
+						 , MOD_ID                               AS modId    
+						 , MOD_NAME                             AS modName  
+						 , MOD_DT                               AS modDt    
+				      FROM REC_FAQ
+				     WHERE 1=1
+		]]>	       
+			     	<if test="searchType eq '1'.toString() and SKEY_1 != '' and SKEY_1 != null">
+			     		AND TITLE like  CONCAT('%',#{SKEY_1},'%')
+			     	</if>
+			     	<if test="searchType eq '2'.toString() and SKEY_1 != '' and SKEY_1 != null">
+			     		AND REG_NAME like  CONCAT('%',#{SKEY_1},'%')
+			     	</if>
+			     	<if test="searchType eq '3'.toString() and SKEY_1 != '' and SKEY_1 != null">
+			     		AND CONTENT_Q like  CONCAT('%',#{SKEY_1},'%')
+			     	</if>
+			     	
+			     	
+		<![CDATA[   
+		  	
+			     	) AS T
+	     	   WHERE 1=1
+	     	     AND ROW BETWEEN #{firstIndex} and #{lastIndex}
+	     	    
+     	]]>	  
+		     	<if test="sort  != '' and sort != null">
+		     	ORDER BY ${sort} ${order}
+		     	</if>
+		   
+     </select>
+     
+   
+</mapper>

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="code">
+	<select id="selectCodeGruop" resultType="java.util.HashMap">
+     	SELECT * FROM REC_CODE_GROUP order by G_CODE
+     </select>
+     
+     <insert id="insertCodeGroup" parameterType="java.util.HashMap" >
+     	insert into REC_CODE_GROUP
+     	(G_CODE, G_NAME)
+     	values
+     	( #{G_CODE}, #{G_NAME} )
+     </insert>
+     
+     <delete id="deleteCodeGroup" parameterType="java.util.HashMap" >
+     	delete from REC_CODE_GROUP where G_CODE = #{G_CODE}
+     </delete>
+     
+     <update id="updateCodeGroup" parameterType="java.util.HashMap" >
+     	update REC_CODE_GROUP set
+     	G_CODE = #{G_CODE} ,
+     	G_NAME = #{G_NAME}
+     	where G_CODE = #{G_CODE}
+     </update>
+     
+     <select id="selectCodeByGruop" parameterType="string" resultType="hashmap">
+     	<![CDATA[
+			SELECT *
+			FROM REC_CODE
+			WHERE SUBSTRING(CODE, 1, 2) = #{G_CODE}
+		]]>
+     </select>
+     
+     <insert id="insertCodeByGroup" parameterType="java.util.HashMap" >
+     	insert into REC_CODE
+     	(CODE, NAME, EXPR)
+     	values
+     	( #{CODE}, #{NAME}, #{EXPR} )
+     </insert>
+     
+     <delete id="deleteCodeByGroup" parameterType="java.util.HashMap" >
+     	delete from REC_CODE where CODE = #{CODE}
+     </delete>
+     
+     <update id="updateCodeByGroup" parameterType="java.util.HashMap" >
+     	update REC_CODE set
+     	CODE = #{CODE} ,
+     	NAME = #{NAME} ,
+     	EXPR = #{EXPR} 
+     	where CODE = #{CODE}
+     </update>
+     
+     <insert id="insertDummy">
+     	insert into REC_CODE_GROUP
+     	(G_CODE, G_NAME)
+     	values
+     	( '1', '1111' )
+     </insert>
+     
+     <insert id="insertDummy2">
+     	insert into REC_CODE_GROUP
+     	(G_CODE, G_NAME)
+     	values
+     	( '333333', '1111' )
+     </insert>
+   
+   
+</mapper>

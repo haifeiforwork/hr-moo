@@ -1,0 +1,870 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="admin.recruit">
+
+	<select id="getMainRecruitNoticeCnt" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+		<![CDATA[
+			SELECT SUM(X.S1) AS S1
+			     , SUM(X.S2) AS S2
+				 , SUM(X.S3) AS S3
+				 , SUM(X.S1) + SUM(X.S2) + SUM(X.S3) AS ALL_CNT
+			  FROM (
+					SELECT CASE WHEN R_GUBUN = '40001' THEN 1 ELSE 0 END AS S1
+						 , CASE WHEN R_GUBUN = '40002' THEN 1 ELSE 0 END AS S2
+						 , CASE WHEN R_GUBUN = '40003' THEN 1 ELSE 0 END AS S3
+					  FROM (
+							SELECT R_GUBUN
+								 , CASE 
+										WHEN GETDATE() > CONVERT(DATETIME, R_EDATE + ' ' + R_EDATE_TIME + ':00:00') THEN '3'
+										WHEN GETDATE() < CONVERT(DATETIME, R_SDATE + ' ' + R_SDATE_TIME + ':00:00') THEN '1'
+										ELSE '2'
+									 END AS JOB_STATUS
+							  FROM REC_NOTICE A
+							 WHERE 1=1
+							   AND R_SHOW_YN = 'Y'
+							 ) R
+					 WHERE 1=1
+					   
+	                ) X
+		]]>	 
+	</select>
+		
+	<select id="getMainRecruitNoticeList" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+		<![CDATA[
+			SELECT TOP(4) *
+			  FROM (
+					SELECT ROW_NUMBER() OVER(ORDER BY R_SDATE DESC)                   AS ROW
+   						 , IDX
+						 , R_TITLE
+						 , R_CONTENT
+						 , R_GUBUN
+						 , (SELECT NAME FROM REC_CODE WHERE SUBSTRING(CODE, 1, 2) = '40' AND CODE = A.R_GUBUN) AS R_GUBUN_NM
+						 , R_SDATE
+						 , R_EDATE
+						 , R_SDATE_TIME
+						 , R_EDATE_TIME
+						 , R_ONLINE_YN
+						 , (CASE WHEN R_ONLINE_YN = 'Y' THEN '온라인' ELSE '오프라인' END ) AS R_ONLINE_YN_NM
+						 , R_SNUM
+						 , R_SAVE_FILE
+						 , R_REAL_FILE
+						 , R_TOP_YN
+						 , R_SHOW_YN
+						 , R_HIT
+						 , CASE 
+								WHEN GETDATE() > CONVERT(DATETIME, R_EDATE + ' ' + R_EDATE_TIME + ':00:00') THEN '3'
+								WHEN GETDATE() < CONVERT(DATETIME, R_SDATE + ' ' + R_SDATE_TIME + ':00:00') THEN '1'
+								ELSE '2'
+							END AS JOB_STATUS
+						 , CASE 
+								WHEN GETDATE() > CONVERT(DATETIME, R_EDATE + ' ' + R_EDATE_TIME + ':00:00') THEN '마감'
+								WHEN GETDATE() < CONVERT(DATETIME, R_SDATE + ' ' + R_SDATE_TIME + ':00:00') THEN '예정'
+								ELSE '진행중'
+							END AS JOB_STATUS_TXT
+					     , DATEDIFF(DD,GETDATE(),CONVERT(DATETIME, R_EDATE + ' ' + R_EDATE_TIME + ':00:00'))  	AS D_DAY	 
+ 						 , REG_ID
+						 , REG_NAME
+						 , REG_DT
+					  FROM REC_NOTICE A
+					 WHERE 1=1
+					   AND R_SHOW_YN = 'Y'
+					 ) R
+			 WHERE 1=1
+			   
+		]]>	 
+			<if test="rGubun != '' and rGubun != null">
+	     		AND R_GUBUN = #{rGubun}
+	     	</if>
+	</select>
+	
+
+	<select id="selectRec0001list" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+	
+		<![CDATA[
+	     	SELECT * 
+	     	  FROM (
+	     			SELECT ROW_NUMBER() OVER(ORDER BY IDX DESC)                     AS ROW
+	     			     , IDX
+						 , R_TITLE
+						 , R_CONTENT
+						 , R_GUBUN
+						 , (SELECT NAME FROM REC_CODE WHERE SUBSTRING(CODE, 1, 2) = '40' AND CODE = A.R_GUBUN) AS R_GUBUN_NM
+						 , R_SDATE
+						 , R_EDATE
+						 , R_SDATE_TIME
+						 , R_EDATE_TIME
+						 , R_ONLINE_YN
+						 , (CASE WHEN R_ONLINE_YN = 'Y' THEN '온라인' ELSE '오프라인' END ) AS R_ONLINE_YN_NM
+						 , R_SNUM
+						 , R_SAVE_FILE
+						 , R_REAL_FILE
+						 , R_TOP_YN
+						 , R_SHOW_YN
+						 , R_HIT
+						 , CASE 
+								WHEN GETDATE() > CONVERT(DATETIME, R_EDATE + ' ' + R_EDATE_TIME + ':00:00') THEN '3'
+								WHEN GETDATE() < CONVERT(DATETIME, R_SDATE + ' ' + R_SDATE_TIME + ':00:00') THEN '1'
+								ELSE '2'
+							END AS JOB_STATUS
+						 , CASE 
+								WHEN GETDATE() > CONVERT(DATETIME, R_EDATE + ' ' + R_EDATE_TIME + ':00:00') THEN '마감'
+								WHEN GETDATE() < CONVERT(DATETIME, R_SDATE + ' ' + R_SDATE_TIME + ':00:00') THEN '예정'
+								ELSE '진행중'
+							END AS JOB_STATUS_TXT
+						 , REG_ID
+						 , REG_NAME
+						 , REG_DT
+				      FROM REC_NOTICE A
+				     WHERE 1=1
+		]]>	       
+					
+					<if test="gubunType1 != '' and gubunType1 != null">
+			     		AND R_GUBUN = #{gubunType1}
+			     	</if>
+			     		
+			     	<if test="searchType eq '1'.toString() and SKEY_1 != '' and SKEY_1 != null">
+			     		AND R_TITLE like  CONCAT('%',#{SKEY_1},'%')
+			     	</if>
+			     	<if test="searchType eq '2'.toString() and SKEY_1 != '' and SKEY_1 != null">
+			     		AND R_CONTENT like  CONCAT('%',#{SKEY_1},'%')
+			     	</if>
+		<![CDATA[   
+		  	
+			     	) AS T
+	     	   WHERE 1=1
+	     	     AND ROW BETWEEN #{firstIndex} and #{lastIndex}
+     	]]>	     
+     </select>
+     
+	<select id="selectRec0001count" parameterType="java.util.HashMap" resultType="java.lang.Integer">
+		<![CDATA[
+     		SELECT COUNT(*)
+		      FROM REC_NOTICE
+		     WHERE 1=1
+	    ]]>
+	    
+	     	<if test="gubunType1 != '' and gubunType1 != null">
+	     		AND R_GUBUN = #{gubunType1}
+	     	</if>
+	     		
+	     	<if test="searchType eq '1'.toString() and SKEY_1 != '' and SKEY_1 != null">
+	     		AND R_TITLE like  CONCAT('%',#{SKEY_1},'%')
+	     	</if>
+	     	<if test="searchType eq '2'.toString() and SKEY_1 != '' and SKEY_1 != null">
+	     		AND R_CONTENT like  CONCAT('%',#{SKEY_1},'%')
+	     	</if>
+     </select>
+     
+     <select id="selectRec0002Detail" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+     	<![CDATA[
+     		SELECT ROW_NUMBER() OVER(ORDER BY IDX DESC)                     AS ROW
+   			     , IDX
+				 , R_TITLE 
+				 , R_CONTENT                                                AS R_CONTENT
+				 , R_GUBUN
+				 , (CASE WHEN R_GUBUN = 1 THEN '신입'
+				         WHEN R_GUBUN = 2 THEN '경력'
+				         WHEN R_GUBUN = 3 THEN '신입/경력'
+				         ELSE                  '기타'
+				    END )                                                   AS R_GUBUN_NM
+				 , R_SDATE
+				 , R_EDATE
+				 , R_SDATE_TIME
+				 , R_EDATE_TIME
+				 , R_ONLINE_YN
+				 , (CASE WHEN R_ONLINE_YN = 'Y' THEN '온라인' ELSE '오프라인' END ) AS R_ONLINE_YN_NM
+				 , R_SNUM
+				 , R_SAVE_FILE
+				 , R_REAL_FILE
+				 , R_TOP_YN
+				 , R_SHOW_YN
+				 , R_HIT
+				 , REG_ID
+				 , REG_NAME
+				 , REG_DT
+		      FROM REC_NOTICE
+		     WHERE 1=1
+     		   AND IDX = #{idx}
+     	]]>
+     </select>
+     
+     <select id="selectRec0002DetailCareerList" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+     	<![CDATA[
+     		SELECT IDX
+				 , R_IDX
+				 , R_CODE1
+				 , R_CODE2
+				 , R_CODE3
+		      FROM REC_NOTICE_OPTION
+		     WHERE 1=1
+     		   AND R_IDX = #{idx}
+     	]]>
+     </select>
+     
+     <delete id="deleteRec0001" parameterType="java.util.HashMap">
+     	<![CDATA[
+	     	DELETE 
+	     	  FROM REC_NOTICE
+	     	 WHERE 1=1
+	     	   AND IDX = #{idx}
+   	   ]]>
+     </delete>
+     
+     <insert id="insertRec0002" parameterType="java.util.HashMap">
+     	<selectKey keyProperty="rIdx" resultType="java.lang.Integer" order="AFTER" >
+   			SELECT MAX(IDX) FROM REC_NOTICE WHERE 1=1
+	   </selectKey>
+   		  
+   		
+     <![CDATA[
+	     	INSERT INTO REC_NOTICE( 
+	     	                        R_TITLE
+						          , R_CONTENT
+						          , R_GUBUN
+						          , R_SDATE
+						          , R_EDATE
+						          , R_SDATE_TIME
+						          , R_EDATE_TIME
+						          , R_ONLINE_YN
+						          , R_SNUM
+						          , R_SAVE_FILE
+						          , R_REAL_FILE
+						          , R_TOP_YN
+						          , R_SHOW_YN
+						          , R_HIT
+						          , REG_ID
+						          , REG_NAME
+						          , REG_DT
+						   )VALUES(
+						            #{rTitle}     
+						          , #{rContent}      
+						          , #{rGubun}     
+						          , #{rSdate}     
+						          , #{rEdate}     
+						          , #{rSdateTime}
+						          , #{rEdateTime}
+						          , #{rOnlineYn} 
+						          , #{rSnum}      
+						          , #{rSaveFile} 
+						          , #{rRealFile}
+		 ]]>						          
+						          	<choose>
+						          		<when test="rTopYn eq 'Y'.toString()">
+							          		<![CDATA[
+							          		, 'Y'
+							          		
+							          		]]>
+						          		</when>
+						          		<otherwise>
+						          		<![CDATA[
+						          		, 'N'
+						          		]]>
+						          		</otherwise>
+						          	</choose>
+						          	<choose>
+						          		<when test="rShowYn eq 'Y'.toString()">
+						          		<![CDATA[
+						          		, 'Y'
+						          		
+						          		]]>
+						          		</when>
+						          		<otherwise>
+						          		<![CDATA[
+						          		, 'N'
+						          		]]>
+						          		</otherwise>
+						          	</choose>
+		<![CDATA[				          	
+						          , 0       
+						          , #{regId}      
+						          , #{regName}    
+						          , GETDATE()  
+						          )
+		]]>					     
+			
+			
+	 	
+     </insert>
+     
+     
+     <insert id="insertRec0002Career" parameterType="java.util.HashMap">
+     		INSERT INTO REC_NOTICE_OPTION(
+     									   R_IDX
+							             , R_CODE1
+							             , R_CODE2
+							             , R_CODE3
+							      )VALUES(
+							               #{rIdx  }
+							             , #{rCode1}
+							             , #{rCode2}
+							             , REPLACE(<foreach collection="rCode3" item="code3" index="index" open="'" close="'" separator="|">${code3}</foreach>,' ','') 
+							             )   
+     </insert>
+     
+     <delete id="deleteRec0002Career" parameterType="java.util.HashMap">
+     	DELETE 
+     	  FROM REC_NOTICE_OPTION
+     	 WHERE 1=1
+     	   AND R_IDX = #{idx}
+     </delete>
+     
+     
+     
+     <update id="updateRec0002" parameterType="java.util.HashMap">
+	     	UPDATE REC_NOTICE
+		       SET R_TITLE      =  #{rTitle}    
+	             , R_CONTENT    =  #{rContent}  
+	             , R_GUBUN      =  #{rGubun}    
+	             , R_SDATE      =  #{rSdate}    
+	             , R_EDATE      =  #{rEdate}    
+	             , R_SDATE_TIME =  #{rSdateTime}
+	             , R_EDATE_TIME =  #{rEdateTime}
+	             , R_ONLINE_YN  =  #{rOnlineYn} 
+	             , R_SNUM       =  #{rSnum}     
+	             , R_SAVE_FILE  =  #{rSaveFile} 
+	             , R_REAL_FILE  =  #{rRealFile} 
+	             , R_TOP_YN     =  <choose>
+						          		<when test="rTopYn eq 'Y'.toString()">
+							          		<![CDATA[
+							          		 'Y'
+							          		
+							          		]]>
+						          		</when>
+						          		<otherwise>
+						          		<![CDATA[
+						          		 'N'
+						          		]]>
+						          		</otherwise>
+						          	</choose>    
+	             , R_SHOW_YN    =  <choose>
+						          		<when test="rShowYn eq 'Y'.toString()">
+						          		<![CDATA[
+						          		 'Y'
+						          		
+						          		]]>
+						          		</when>
+						          		<otherwise>
+						          		<![CDATA[
+						          		 'N'
+						          		]]>
+						          		</otherwise>
+						          	</choose>   
+	             , REG_ID       =  #{regId}     
+	             , REG_NAME     =  #{regName}   
+	             , REG_DT       =  GETDATE()    
+		     WHERE 1=1
+		       AND IDX = #{idx} 
+     </update>
+     
+      <select id="selectNoticeList" resultType="java.util.HashMap">
+     	<![CDATA[
+     		SELECT IDX
+	     		 , R_TITLE
+	     	  FROM REC_NOTICE
+	         WHERE R_SHOW_YN = 'Y'
+	         ORDER BY IDX DESC
+     	]]>
+     </select>
+   
+   	
+   	<select id="selectRec0100list" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+		<![CDATA[
+	     	SELECT * 
+	     	  FROM (
+	     	  		SELECT ROW_NUMBER() OVER(ORDER BY A.REG_DT DESC)                     AS ROW 
+			             , A.R_AP_CODE
+			             , A.R_IDX
+			             , A.R_NAME
+			             , A.R_PWD
+			             , A.R_GUBUN
+			             , (SELECT NAME FROM REC_CODE WHERE SUBSTRING(CODE, 1, 2) = '40' AND CODE = A.R_GUBUN) AS R_GUBUN_NM
+			             , A.R_PHOTO
+			             , A.R_HNAME
+			             , A.R_ENAME
+			             , A.R_BIRTH
+			             , A.R_BIRTH_CODE
+			             , A.R_AGE
+			             , A.R_SEX_CODE
+			             , A.R_JOB_KIND_CODE1
+			             , (SELECT NAME FROM REC_CODE WHERE SUBSTRING(CODE, 1, 2) = '03' AND CODE = A.R_JOB_KIND_CODE1) AS R_JOB_KIND_CODE1_NM
+			             , A.R_JOB_PART_CODE1
+			             , (SELECT NAME FROM REC_CODE WHERE SUBSTRING(CODE, 1, 2) = '04' AND CODE = A.R_JOB_PART_CODE1) AS R_JOB_PART_CODE1_NM
+			             , A.R_JOB_AREA_CODE1
+			             , (SELECT NAME FROM REC_CODE WHERE SUBSTRING(CODE, 1, 2) = '05' AND CODE = A.R_JOB_AREA_CODE1) AS R_JOB_AREA_CODE1_NM
+			             , A.R_JOB_KIND_CODE2
+			             , (SELECT NAME FROM REC_CODE WHERE SUBSTRING(CODE, 1, 2) = '03' AND CODE = A.R_JOB_KIND_CODE2) AS R_JOB_KIND_CODE2_NM
+			             , A.R_JOB_PART_CODE2
+			             , (SELECT NAME FROM REC_CODE WHERE SUBSTRING(CODE, 1, 2) = '04' AND CODE = A.R_JOB_PART_CODE2) AS R_JOB_PART_CODE2_NM
+			             , A.R_JOB_AREA_CODE2
+			             , (SELECT NAME FROM REC_CODE WHERE SUBSTRING(CODE, 1, 2) = '05' AND CODE = A.R_JOB_AREA_CODE2) AS R_JOB_AREA_CODE2_NM
+			             , A.R_POST
+			             , A.R_ADDR1
+			             , A.R_ADDR2
+			             , A.R_TEL
+			             , A.R_HP
+			             , A.R_EMAIL
+			             , A.R_RELIGION
+			             , A.R_SIGHT_LEFT
+			             , A.R_SIGHT_RIGHT
+			             , A.R_HOBBY
+			             , A.R_COLOR_CODE
+			             , A.R_HEIGHT
+			             , A.R_MARRY_CODE
+			             , A.R_WEIGHT
+			             , A.R_BOHUN_KIND
+			             , A.R_BOHUN_NUM
+			             , A.R_BOHUN_RELATION
+			             , A.R_ARMY_KIND
+			             , A.R_ARMY_TYPE
+			             , A.R_ARMY_BRANCH
+			             , A.R_ARMY_CLASS
+			             , A.R_ARMY_SDATE
+			             , A.R_ARMY_EDATE
+			             , A.R_ARMY_EXCEPT_REASON
+			             , A.R_STATUS_CODE
+			             , (SELECT NAME FROM REC_CODE WHERE SUBSTRING(CODE, 1, 2) = '50' AND CODE = A.R_STATUS_CODE) AS R_STATUS_CODE_NM
+			             , A.R_IP
+			             , A.REG_DT
+			             , A.MOD_DT
+			             , A.R_CONFIRM
+			             , A.ADM_ID
+			             , A.ADM_DT
+			             , A.ADM_DEL
+			             , B.S_NAME
+			             , B.S_TYPE_CODE
+			             , B.S_DN_CODE
+			             , B.S_BP_CODE
+			             , B.S_MAJOR
+			             , B.S_MAJOR_CODE
+			             , B.S_MAJOR_GROUP
+			             , B.S_MAJOR_DETAIL
+			             , B.S_MINOR
+			             , B.S_MINOR_CODE
+			             , B.S_MINOR_GROUP
+			             , B.S_DUAL
+			             , B.S_DUAL_CODE
+			             , B.S_DUAL_GROUP
+			             , B.S_ENT_MONTH
+			             , B.S_GRA_MONTH
+			             , B.S_GRA_TYPE
+			         FROM REC_APPLY_MASTER A
+			         LEFT JOIN (
+			              		SELECT *
+			              			FROM (
+			              					SELECT R_AP_CODE
+			              						, R_IDX
+			              						, S_IDX
+			              						, MAX(S_IDX) OVER(PARTITION BY R_AP_CODE,R_IDX ) AS MAX_SEQ
+			              						, S_NAME
+			              						, S_TYPE_CODE
+			              						, S_DN_CODE
+			              						, S_BP_CODE
+			              						, S_MAJOR
+			              						, S_MAJOR_CODE
+			              						, S_MAJOR_GROUP
+			              						, S_MAJOR_DETAIL
+			              						, S_MINOR
+			              						, S_MINOR_CODE
+			              						, S_MINOR_GROUP
+			              						, S_DUAL
+			              						, S_DUAL_CODE
+			              						, S_DUAL_GROUP
+			              						, S_ENT_MONTH
+			              						, S_GRA_MONTH
+			              						, S_GRA_TYPE
+			              						, REG_DT
+			              						FROM REC_APPLY_SCHOOL
+			              					WHERE 1=1
+			              					) A
+			              		      WHERE 1=1
+			              				AND A.S_IDX = MAX_SEQ
+			                     ) B ON A.R_AP_CODE = B.R_AP_CODE AND A.R_IDX = B.R_IDX
+			        WHERE 1=1
+			          AND A.R_CONFIRM = 0	
+	     			
+		]]>	       
+					
+					<if test="SKEY_1 != '' and SKEY_1 != null">
+			     		AND A.R_IDX = #{SKEY_1}
+			     	</if>
+			     	
+			     	<if test="SKEY_2 != '' and SKEY_2 != null">
+			     		AND A.R_JOB_KIND_CODE1 = #{SKEY_2}
+			     	</if>
+				
+					<if test="SKEY_3 != '' and SKEY_3 != null">
+			     		AND A. R_JOB_PART_CODE1 = #{SKEY_3}
+			     	</if>
+			     	
+			     	<if test="SKEY_4 != '' and SKEY_4 != null">
+			     	<![CDATA[
+			     		AND A.REG_DT >= #{SKEY_4}
+			     	]]>
+			     	</if>
+			     	
+			     	<if test="SKEY_5 != '' and SKEY_5 != null">
+			     	<![CDATA[
+			     		AND A.REG_DT <= #{SKEY_5}
+			     	]]>	
+			     	</if>
+					
+					<if test="SKEY_6 != '' and SKEY_6 != null">
+			     		AND A.R_AP_CODE = #{SKEY_6}
+			     	</if>
+			     	
+			     	<if test="SKEY_7 != '' and SKEY_7 != null">
+			     		AND A.R_GUBUN = #{SKEY_7}
+			     	</if>
+			     	
+			     	<if test="SKEY_8 != '' and SKEY_8 != null">
+			     		AND A.R_NAME LIKE  CONCAT('%',#{SKEY_8},'%')
+			     	</if>
+			     	
+			     	<if test="SKEY_9 != '' and SKEY_9 != null">
+			     		AND A.R_SEX_CODE = #{SKEY_9}
+			     	</if>
+		<![CDATA[   
+		  	
+			     	) AS T
+	     	   WHERE 1=1
+	     	     AND ROW BETWEEN #{firstIndex} and #{lastIndex}
+     	]]>	     
+     </select>
+     
+	<select id="selectRecRec0100count" parameterType="java.util.HashMap" resultType="java.lang.Integer">
+		<![CDATA[
+     		SELECT COUNT(*)
+		      FROM REC_APPLY_MASTER A
+		     WHERE 1=1
+		       AND A.R_CONFIRM = 0	
+	    ]]>
+	    
+	     	<if test="SKEY_1 != '' and SKEY_1 != null">
+	     		AND A.R_IDX = #{SKEY_1}
+	     	</if>
+	     	
+	     	<if test="SKEY_2 != '' and SKEY_2 != null">
+	     		AND A.R_JOB_KIND_CODE1 = #{SKEY_2}
+	     	</if>
+		
+			<if test="SKEY_3 != '' and SKEY_3 != null">
+	     		AND A. R_JOB_PART_CODE1 = #{SKEY_3}
+	     	</if>
+	     	
+	     	<if test="SKEY_4 != '' and SKEY_4 != null">
+	     	<![CDATA[
+	     		AND A.REG_DT >= #{SKEY_4}
+	     	]]>
+	     	</if>
+	     	
+	     	<if test="SKEY_5 != '' and SKEY_5 != null">
+	     	<![CDATA[
+	     		AND A.REG_DT <= #{SKEY_5}
+	     	]]>	
+	     	</if>
+			
+			<if test="SKEY_6 != '' and SKEY_6 != null">
+	     		AND A.R_AP_CODE = #{SKEY_6}
+	     	</if>
+	     	
+	     	<if test="SKEY_7 != '' and SKEY_7 != null">
+	     		AND A.R_GUBUN = #{SKEY_7}
+	     	</if>
+	     	
+	     	<if test="SKEY_8 != '' and SKEY_8 != null">
+	     		AND A.R_NAME LIKE  CONCAT('%',#{SKEY_8},'%')
+	     	</if>
+	     	
+	     	<if test="SKEY_9 != '' and SKEY_9 != null">
+	     		AND A.R_SEX_CODE = #{SKEY_9}
+	     	</if>
+     </select>
+     
+     <select id="selectRecRec0100total" resultType="java.lang.Integer">
+		<![CDATA[
+     		SELECT COUNT(*)
+		      FROM REC_APPLY_MASTER
+		     WHERE 1=1
+		       AND R_CONFIRM = 0	
+	    ]]>
+     </select>
+     
+      <select id="selectKindOptions" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+     	<![CDATA[
+     		SELECT 	T01.R_CODE1 AS CODE
+     				, T02.NAME AS NAME
+			  FROM REC_NOTICE_OPTION T01 
+				INNER JOIN REC_CODE T02  
+				   ON T01.R_CODE1 = T02.CODE
+			 WHERE T01.R_IDX = #{rIdx}
+			   AND SUBSTRING(T02.CODE, 1, 2) = '03'
+			 GROUP BY T01.R_CODE1, T02.NAME
+			 ORDER BY T01.R_CODE1
+     	]]>
+     </select>
+
+     <select id="selectPartOptions" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+     	<![CDATA[
+     		SELECT 	T01.R_CODE2 AS CODE
+     				, T02.NAME AS NAME
+			  FROM REC_NOTICE_OPTION T01 
+				INNER JOIN REC_CODE T02  
+				   ON T01.R_CODE2 = T02.CODE
+			 WHERE T01.R_IDX = #{rIdx}
+			   AND SUBSTRING(T02.CODE, 1, 2) = '04'
+			   AND T01.R_CODE1 = #{rCode1}
+			 GROUP BY T01.R_CODE2, T02.NAME
+			 ORDER BY T01.R_CODE2
+     	]]>
+     </select>
+     
+     
+     <select id="selectAdminRecruitDetail" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+     	<![CDATA[
+     		SELECT ROW_NUMBER() OVER(ORDER BY A.REG_DT DESC)                     AS ROW 
+	             , A.R_AP_CODE
+	             , A.R_IDX
+	             , A.R_NAME
+	             , A.R_PWD
+	             , A.R_GUBUN
+	             , (SELECT NAME FROM REC_CODE WHERE SUBSTRING(CODE, 1, 2) = '40' AND CODE = A.R_GUBUN) AS R_GUBUN_NM
+	             , A.R_PHOTO
+	             , A.R_HNAME
+	             , A.R_ENAME
+	             , A.R_BIRTH
+	             , A.R_BIRTH_CODE
+	             , A.R_AGE
+	             , A.R_SEX_CODE
+	             , A.R_JOB_KIND_CODE1
+	             , (SELECT NAME FROM REC_CODE WHERE SUBSTRING(CODE, 1, 2) = '03' AND CODE = A.R_JOB_KIND_CODE1) AS R_JOB_KIND_CODE1_NM
+	             , A.R_JOB_PART_CODE1
+	             , (SELECT NAME FROM REC_CODE WHERE SUBSTRING(CODE, 1, 2) = '04' AND CODE = A.R_JOB_PART_CODE1) AS R_JOB_PART_CODE1_NM
+	             , A.R_JOB_AREA_CODE1
+	             , (SELECT NAME FROM REC_CODE WHERE SUBSTRING(CODE, 1, 2) = '05' AND CODE = A.R_JOB_AREA_CODE1) AS R_JOB_AREA_CODE1_NM
+	             , A.R_JOB_KIND_CODE2
+	             , (SELECT NAME FROM REC_CODE WHERE SUBSTRING(CODE, 1, 2) = '03' AND CODE = A.R_JOB_KIND_CODE2) AS R_JOB_KIND_CODE2_NM
+	             , A.R_JOB_PART_CODE2
+	             , (SELECT NAME FROM REC_CODE WHERE SUBSTRING(CODE, 1, 2) = '04' AND CODE = A.R_JOB_PART_CODE2) AS R_JOB_PART_CODE2_NM
+	             , A.R_JOB_AREA_CODE2
+	             , (SELECT NAME FROM REC_CODE WHERE SUBSTRING(CODE, 1, 2) = '05' AND CODE = A.R_JOB_AREA_CODE2) AS R_JOB_AREA_CODE2_NM
+	             , A.R_POST
+	             , A.R_ADDR1
+	             , A.R_ADDR2
+	             , A.R_TEL
+	             , A.R_HP
+	             , A.R_EMAIL
+	             , A.R_RELIGION
+	             , A.R_SIGHT_LEFT
+	             , A.R_SIGHT_RIGHT
+	             , A.R_HOBBY
+	             , A.R_COLOR_CODE
+	             , A.R_HEIGHT
+	             , A.R_MARRY_CODE
+	             , A.R_WEIGHT
+	             , A.R_BOHUN_KIND
+	             , (SELECT NAME FROM REC_CODE WHERE SUBSTRING(CODE, 1, 2) = '02' AND CODE = A.R_BOHUN_KIND) AS R_BOHUN_KIND_NM
+	             , A.R_BOHUN_NUM
+	             , A.R_BOHUN_RELATION
+	             , A.R_ARMY_KIND
+	             , (SELECT NAME FROM REC_CODE WHERE SUBSTRING(CODE, 1, 2) = '08' AND CODE = A.R_ARMY_KIND) AS R_ARMY_KIND_NM
+	             , A.R_ARMY_TYPE
+	             , (SELECT NAME FROM REC_CODE WHERE SUBSTRING(CODE, 1, 2) = '06' AND CODE = A.R_ARMY_TYPE) AS R_ARMY_TYPE_NM
+	             , A.R_ARMY_BRANCH
+	             , (SELECT NAME FROM REC_CODE WHERE SUBSTRING(CODE, 1, 2) = '09' AND CODE = A.R_ARMY_BRANCH) AS R_ARMY_BRANCH_NM
+	             , A.R_ARMY_CLASS
+	             , (SELECT NAME FROM REC_CODE WHERE SUBSTRING(CODE, 1, 2) = '07' AND CODE = A.R_ARMY_CLASS) AS R_ARMY_CLASS_NM
+	             , A.R_ARMY_SDATE
+	             , A.R_ARMY_EDATE
+	             , A.R_ARMY_EXCEPT_REASON
+	             , A.R_STATUS_CODE
+	             , (SELECT NAME FROM REC_CODE WHERE SUBSTRING(CODE, 1, 2) = '50' AND CODE = A.R_STATUS_CODE) AS R_STATUS_CODE_NM
+	             , A.R_IP
+	             , A.REG_DT
+	             , A.MOD_DT
+	             , A.R_CONFIRM
+	             , A.ADM_ID
+	             , A.ADM_DT
+	             , A.ADM_DEL
+	         FROM REC_APPLY_MASTER A
+	        WHERE 1=1
+	          AND A.R_AP_CODE = #{rApCode} 
+	          AND A.R_IDX     = #{rIdx} 
+	         
+     	]]>
+     </select>
+     
+     <select id="selectAdminSchoolList" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+     	<![CDATA[
+     		SELECT	R_AP_CODE
+	     			, R_IDX
+	     			, S_IDX
+	     			, S_NAME
+					, S_TYPE_CODE
+					, (SELECT NAME FROM REC_CODE WHERE SUBSTRING(CODE, 1, 2) = '19' AND CODE = A.S_TYPE_CODE) AS S_TYPE_CODE_NM
+					, S_DN_CODE
+					, (SELECT NAME FROM REC_CODE WHERE SUBSTRING(CODE, 1, 2) = '17' AND CODE = A.S_DN_CODE) AS S_DN_CODE_NM
+					, S_BP_CODE
+					, (CASE WHEN S_BP_CODE = '1' THEN '본교' ELSE '분교' END) AS S_BP_CODE_NM 
+					, S_MAJOR
+					, S_MAJOR_CODE
+					, S_MAJOR_GROUP
+					, (SELECT NAME FROM REC_CODE WHERE SUBSTRING(CODE, 1, 2) IN ('14','15') AND CODE = A.S_MAJOR_GROUP) AS S_MAJOR_GROUP_NM
+					, S_MAJOR_DETAIL
+					, S_MINOR
+					, S_MINOR_CODE
+					, S_MINOR_GROUP
+					, S_DUAL
+					, S_DUAL_CODE
+					, S_DUAL_GROUP
+					, S_ENT_MONTH
+					, S_GRA_MONTH
+					, S_GRA_TYPE
+					, (SELECT NAME FROM REC_CODE WHERE SUBSTRING(CODE, 1, 2) = '16' AND CODE = A.S_GRA_TYPE) AS S_GRA_TYPE_NM
+	     		FROM REC_APPLY_SCHOOL A
+	     	WHERE R_AP_CODE = #{rApCode}
+     		  AND R_IDX = #{rIdx}
+	         ORDER BY S_IDX
+     	]]>
+     </select>
+     
+     <select id="selectAdminGradeList" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+     	<![CDATA[
+     		SELECT	R_AP_CODE
+	     			, R_IDX
+	     			, S_IDX
+	     			, S_SCORE_11
+					, S_SCORE_12
+					, S_SCORE_21
+					, S_SCORE_22
+					, S_SCORE_31
+					, S_SCORE_32
+					, S_SCORE_41
+					, S_SCORE_42
+					, S_SCORE_51
+					, S_SCORE_52
+					, S_SCORE_61
+					, S_SCORE_62
+					, S_SCORE_AVG
+					, S_SCORE_FULL
+					, S_SCORE_FINAL
+					, S_THESIS1
+					, S_THESIS1_FILE
+					, S_THESIS2
+					, S_THESIS2_FILE
+	     	FROM REC_APPLY_GRADE
+	     	WHERE R_AP_CODE = #{rApCode}
+     		  AND R_IDX = #{rIdx}
+	         
+     	]]>
+     </select>
+    
+     <select id="selectAdminCareerList" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+     	<![CDATA[
+     		SELECT	R_AP_CODE
+	     			R_IDX,
+	     			C_SEQ,
+	     			C_NAME,
+	     			C_PART,
+	     			C_INCOME,
+	     			C_POSITION,
+	     			C_WORK,
+	     			C_SMONTH,
+	     			C_EMONTH,
+	     			C_PERFORM,
+	     			C_TYPE,
+	     			C_REL_YN,
+	     			C_REASON
+	     	FROM REC_APPLY_CAREER
+	     	WHERE R_AP_CODE = #{rApCode}
+     		  AND R_IDX = #{rIdx}
+     		ORDER BY C_SEQ
+	         
+     	]]>
+     </select>
+     
+     <select id="selectAdminTrainingList" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+     	<![CDATA[
+     		SELECT	R_AP_CODE
+	     			R_IDX,
+	     			T_SEQ,
+	     			T_GUBUN_CODE,
+	     			T_NAT_CODE,
+	     			(SELECT EXPR FROM REC_CODE WHERE SUBSTRING(CODE, 1, 2) = '20' AND CODE = A.T_NAT_CODE) AS T_NAT_CODE_NM,
+	     			T_INSTITUTION,
+	     			T_SDATE,
+	     			T_EDATE,
+	     			T_TERM
+	     	FROM REC_APPLY_TRAINING A
+	     	WHERE R_AP_CODE = #{rApCode}
+     		  AND R_IDX = #{rIdx}
+     		ORDER BY T_SEQ
+	         
+     	]]>
+     </select>
+     
+     <select id="selectAdminLanguageList" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+     	<![CDATA[
+     		SELECT	R_AP_CODE
+	     			R_IDX,
+	     			L_SEQ,
+	     			L_LANGUAGE,
+	     			(SELECT NAME FROM REC_CODE WHERE SUBSTRING(CODE, 1, 2) = '10' AND CODE = A.L_LANGUAGE) AS L_LANGUAGE_NM,
+	     			L_EXAM,
+	     			(SELECT NAME FROM REC_CODE WHERE SUBSTRING(CODE, 1, 2) = '11' AND CODE = A.L_EXAM) AS L_EXAM_NM,
+	     			L_SCORE,
+	     			L_GRADE,
+	     			L_EDATE,
+	     			L_INSTIT
+	     	FROM REC_APPLY_LANGUAGE A
+	     	WHERE R_AP_CODE = #{rApCode}
+     		  AND R_IDX = #{rIdx}
+     		ORDER BY L_SEQ
+	         
+     	]]>
+     </select>
+     
+     <select id="selectAdminCertList" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+     	<![CDATA[
+     		SELECT	R_AP_CODE
+	     			R_IDX,
+	     			C_SEQ,
+	     			C_NAME,
+	     			C_CODE,
+	     			C_GRADE,
+	     			(SELECT NAME FROM REC_CODE WHERE SUBSTRING(CODE, 1, 2) = '21' AND CODE = A.C_GRADE) AS C_GRADE_NM,
+	     			C_EDATE,
+	     			C_INSTIT
+	     	FROM REC_APPLY_CERT A
+	     	WHERE R_AP_CODE = #{rApCode}
+     		  AND R_IDX = #{rIdx}
+     		ORDER BY C_SEQ
+	         
+     	]]>
+     </select>
+     
+     <select id="selectAdminIntroList" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+     	<![CDATA[
+     		SELECT	R_AP_CODE
+	     			R_IDX,
+	     			I_SEQ,
+	     			I_CODE,
+	     			I_DESC
+	     	FROM REC_APPLY_INTRODUCTION
+	     	WHERE R_AP_CODE = #{rApCode}
+     		  AND R_IDX = #{rIdx}
+     		ORDER BY I_SEQ
+     	]]>
+     </select>
+     
+     <select id="selectAdminItemIntroList" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+		<![CDATA[
+	     	SELECT	IDX,
+	     			ITEM_TITLE,
+	     			ITEM_DESC,
+	     			LENGTH_MIN,
+	     			LENGTH_MAX
+	     	FROM REC_ITEM_INTRO
+     		ORDER BY IDX
+		]]>
+     </select>
+</mapper>

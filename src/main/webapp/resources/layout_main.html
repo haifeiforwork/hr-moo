@@ -1,0 +1,239 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>무림 채용</title>
+    <link rel="stylesheet" type="text/css" href="css/layout.css" />
+    <link rel="stylesheet" type="text/css" href="css/common.css" />
+    <link rel="stylesheet" type="text/css" href="css/object.css" />
+    <script type="text/javascript" src="/resources/js/lib/jquery-1.11.3.js"></script>
+    <script type="text/javascript" src="/resources/js/lib/jquery-ui.js"></script>
+    
+<script type="text/javascript">
+$(document).ready(function(){
+	$(".menu>a").click(function() {
+		//alert(1);
+		if($("#gnb_sub").css("display") == "none"){
+			$('#gnb_sub').css("display", "block");
+		} else {
+			$('#gnb_sub').css("display", "none");
+		}
+    });
+
+});
+</script>
+</head>
+
+<body>
+
+	<div id="wrap">
+		<!-- 헤더 시작 -->
+		<header>
+			<div class="header_wrap">
+				<!-- 상단 로고 링크 영역 -->
+	      <h1>
+					<a href="" class="logo" title="Moorim 채용 홈페이지 메인 바로가기"><img src="images/header_logo.png" alt="Moorim 로고"></a>
+				</h1>
+				<!-- 상단 서브 링크 영역 -->
+				<div class="util">
+					<ul>
+						<li>
+							<a href="">Log in</a>
+						</li>
+						<li>
+							<a href="">My Page</a>
+						</li>
+						<li>
+							<a href="" class="go_link" target="_blank" title="Moorim 기업 홈페이지 바로가기 (새창열림)">moorim.co.kr</a>
+						</li>
+					</ul>
+				</div>
+				<!-- 상단 메뉴 영역 -->
+	      <nav>
+					<div class="gnb">
+						<ul>
+							<li class="menu">
+								<a href="">채용안내</a> <!-- 메뉴 마우스 오버시 class="depth2"와 하단 id="gnb_sub" display를 block 으로 변경하여 서브 메뉴를 펼쳐줌 -->
+								<ul class="depth2">
+									<li><a href="">안내/절차</a></li>
+									<li><a href="">인재상</a></li>
+									<li><a href="">인사제도</a></li>
+									<li><a href="">복리후생</a></li>
+									<li><a href="">직무소개</a></li>
+									<li><a href="">개인정보 처리방침</a></li>
+								</ul>
+							</li>
+							<li class="menu">
+								<a href="">채용공고</a>
+								<ul class="depth2">
+									<li><a href="">채용공고</a></li>
+									<li><a href="">지원서 작성</a></li>
+								</ul>
+							</li>
+							<li class="menu">
+								<a href="">채용지원</a>
+								<ul class="depth2">
+									<li><a href="">지원확인 및 수정</a></li>
+									<li><a href="">합격자 발표</a></li>
+									<li><a href="">비밀번호 찾기</a></li>
+								</ul>
+							</li>
+							<li class="menu">
+								<a href="">채용문의</a>
+								<ul class="depth2">
+									<li><a href="">FAQ</a></li>
+									<li><a href="">1:1 문의</a></li>
+									<li><a href="">채용담당자 안내</a></li>
+								</ul>
+							</li>
+						</ul>
+					</div>
+	      </nav>
+			</div>
+  	</header>
+		<div id="gnb_sub" style="display:none;"></div>
+		<!-- 헤더 끝 -->
+
+		<!-- 메인 컨텐츠 시작 -->
+		<div class="main_container">
+			<div class="main_wrap">
+				<!-- 이미지 배너 영역 -->
+				<div class="banner">
+					모두가 행복한 미래를 만들기 위해<br />
+					앞장서는 기업, 무림입니다.
+				</div>
+				<!-- 채용공고 영역 -->
+				<div class="noti_wrap">
+					<div class="header">
+						<h1>채용공고</h1>
+						<ul class="category">
+							<li><a href="" class="selected">전체 99</a></li>
+							<li><a href="">신입 99</a></li>
+							<li><a href="">경력 99</a></li>
+							<li><a href="">신입/경력 99</a></li>
+							<li class="btn"><a href="">전체 채용공고 더보기</a></li>
+						</ul>
+					</div>
+					<ul class="list">
+						<li class="type1">
+							<a href="#">
+								<div class="header">
+									<h1>신입</h1>
+									<span class="ing">D-99</span>
+								</div>
+								<span class="title">공고 제목</span>
+								<span class="date">모집 마감일 : <span>2017.01.01</span></span>
+							</a>
+						</li>
+						<li class="type2">
+							<a href="#">
+								<div class="header">
+									<h1>경력</h1>
+									<span class="ing">D-99</span>
+								</div>
+								<span class="title">공고 제목</span>
+								<span class="date">모집 마감일 : <span>2017.01.01</span></span>
+							</a>
+						</li>
+						<li class="type3">
+							<a href="#">
+								<div class="header">
+									<h1>신입/경력</h1>
+									<span class="ing">D-99</span>
+								</div>
+								<span class="title">공고 제목</span>
+								<span class="date">모집 마감일 : <span>2017.01.01</span></span>
+							</a>
+						</li>
+						<li class="type1">
+							<a href="#">
+								<div class="header">
+									<h1>신입</h1>
+									<span class="end">마감</span>
+								</div>
+								<span class="title">공고 제목</span>
+								<span class="date">모집 마감일 : <span>2017.01.01</span></span>
+							</a>
+						</li>
+						<li class="type3">
+							<a href="#">
+								<div class="header">
+									<h1>신입/경력</h1>
+									<span class="end">마감</span>
+								</div>
+								<span class="title">공고 제목</span>
+								<span class="date">모집 마감일 : <span>2017.01.01</span></span>
+							</a>
+						</li>
+						<li class="type1">
+							<a href="#">
+								<div class="header">
+									<h1>신입</h1>
+									<span class="end">마감</span>
+								</div>
+								<span class="title">공고 제목</span>
+								<span class="date">모집 마감일 : <span>2017.01.01</span></span>
+							</a>
+						</li>
+					</ul>
+				</div>
+				<!-- 바로가기 링크 영역 -->
+				<ul class="qmenu">
+					<li>
+						<a href="" class="menu1">
+							<h1>인재상</h1>
+							<span>무림은 도전과 혁신, 협력과<br />프로정신을 가진 새로운 인재를 찾습니다.</span>
+						</a>
+					</li>
+					<li>
+						<a href="" class="menu2">
+							<h1>지원서 작성</h1>
+							<span>미래를 향한 도전 그 중심에 무림이 있습니다.<br />무림과 함께 하십시오.</span>
+						</a>
+					</li>
+					<li>
+						<a href="" class="menu3">
+							<h1>지원서 확인/수정</h1>
+							<span>모집 마감일까지 자유롭게<br />작성한 입사 지원서의 확인 수정이 가능합니다.</span>
+						</a>
+					</li>
+					<li>
+						<a href="" class="menu4">
+							<h1>FAQ</h1>
+							<span>채용과 홈페이지 이용에 대한 궁금증을<br />FAQ에서 빠르게 해결 할 수 있습니다.</span>
+						</a>
+					</li>
+				</ul>
+
+			</div>
+		</div>
+		<!-- 메인 컨텐츠 끝 -->
+
+		<!-- 푸터 시작 -->
+		<footer>
+			<div class="footer_wrap">
+				<!-- 하단 로고 영역 -->
+				<a href="" class="logo" title="Moorim 채용 홈페이지 메인 바로가기"><img src="images/footer_logo.png" alt="Moorim 로고"></a>
+				<!-- 하단 정보 영역 -->
+				<div class="info">
+					<div class="location">
+						<span>서울 강남구 강남대로 656(신사동)</span><span>tel 02.3485.1500</span><span>fax 02.3443.2997</span>
+					</div>
+					<span class="copy">Copyright(c) 2018 Moorim Paper. All right reserved.</span>
+					<span class="wa">본 웹사이트는 장애인을 비롯한 모든 분들이 이용에 불편이 없도록 웹 접근성 표준 지침을 준수했습니다.</span>
+				</div>
+				<!-- 하단 링크 영역 -->
+				<div class="link">
+					<ul>
+						<li><a href="">개인정보처리 방침</a></li>
+						<li><a href="">이메일 무단수집 거부</a></li>
+						<li><a href="">SITE MAP</a></li>
+					</ul>
+				</div>
+			</div>
+		</footer>
+		<!-- 푸터 끝 -->
+
+	</div>
+
+</body>

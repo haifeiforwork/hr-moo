@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="clientFaq">
+	
+	<select id="selectFaqList" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+		<![CDATA[
+	     	SELECT * 
+	     	  FROM (
+	     			SELECT ROW_NUMBER() OVER(ORDER BY IDX DESC) AS ROW
+	     			     , IDX
+						 , TITLE
+						 , CONTENT_Q
+						 , ATT_FILE
+						 , HIT_CNT
+						 , DEL_YN
+						 , REG_ID
+						 , REG_NAME
+						 , REG_DT
+						 , MOD_ID
+						 , MOD_NAME
+						 , MOD_DT
+				      FROM REC_FAQ
+				     WHERE 1=1
+		]]>	       
+			     	<if test="searchType =='' and SKEY_1 != '' and SKEY_1 != null">
+			     		AND TITLE like  CONCAT('%',#{SKEY_1},'%')
+			     		OR CONTENT_Q like  CONCAT('%',#{SKEY_1},'%')
+			     	</if>
+			     	<if test="searchType eq '1'.toString() and SKEY_1 != '' and SKEY_1 != null">
+			     		AND TITLE like  CONCAT('%',#{SKEY_1},'%')
+			     	</if>
+			     	<if test="searchType eq '3'.toString() and SKEY_1 != '' and SKEY_1 != null">
+			     		AND CONTENT_Q like  CONCAT('%',#{SKEY_1},'%')
+			     	</if>
+		<![CDATA[   
+		  	
+			     	) AS T
+	     	   WHERE 1=1
+	     	     AND ROW BETWEEN #{firstIndex} and #{lastIndex}
+     	]]>	     
+     </select>
+     
+	<select id="selectFaqCount" parameterType="java.util.HashMap" resultType="java.lang.Integer">
+		<![CDATA[
+     		SELECT COUNT(*)
+		      FROM REC_FAQ
+		     WHERE 1=1
+	    ]]>
+	    
+	     	<if test="searchType =='' and SKEY_1 != '' and SKEY_1 != null">
+	     		AND TITLE like  CONCAT('%',#{SKEY_1},'%')
+	     		OR CONTENT_Q like  CONCAT('%',#{SKEY_1},'%')
+	     	</if>
+	     	<if test="searchType eq '1'.toString() and SKEY_1 != '' and SKEY_1 != null">
+	     		AND TITLE like  CONCAT('%',#{SKEY_1},'%')
+	     	</if>
+	     	<if test="searchType eq '3'.toString() and SKEY_1 != '' and SKEY_1 != null">
+	     		AND CONTENT_Q like  CONCAT('%',#{SKEY_1},'%')
+	     	</if>
+     </select>
+</mapper>

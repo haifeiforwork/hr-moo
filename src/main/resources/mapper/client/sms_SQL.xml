@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sms">
+	<insert id="insertSms" parameterType="hashmap">
+	<![CDATA[
+		DECLARE @IDENTITY varchar(20)
+	    DECLARE @RNDNUM INT
+	    SET @RNDNUM = cast(RAND() * 1000 as int)
+	    SET @IDENTITY = dbo.IKEP_FN_SMSFormatDate(CURRENT_TIMESTAMP, @RNDNUM)
+	    insert into arreo_sms 
+	    ( cmp_msg_id
+	     ,cmp_usr_id 
+	     ,odr_fg
+	     ,sms_gb
+	     ,used_cd
+	     ,msg_gb  
+	     ,wrt_dttm
+	     ,snd_dttm
+	     ,rcv_phn_id
+	     ,subject 
+	     ,snd_msg 
+	     ,callback 
+	     ,sms_st
+	     ,expire_val
+	     ,nat_cd
+	     ,RSRVD_WD 
+	     ,rslt_val)
+	    values
+	    ( @IDENTITY
+	     ,'LSM02'
+	     ,'2'
+	     ,'1'
+	     ,'00'
+	     ,'M'
+	     ,SUBSTRING(@IDENTITY,0,15)
+	     ,SUBSTRING(@IDENTITY,0,15)
+	     ,#{PHONE_NO}
+	     ,#{TITLE}
+	     ,#{MSG}
+	     ,#{SENDER_NO}
+	     ,'0'
+	     ,'0'
+	     ,'82'
+	     ,'B2B'
+	     ,'99') 
+	 ]]>
+     </insert>
+   
+     
+	
+   
+</mapper>

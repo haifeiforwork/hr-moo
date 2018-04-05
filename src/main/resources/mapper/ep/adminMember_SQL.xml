@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+<mapper namespace="admin.member">
+    
+    <select id="getEpUser" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+    	select user_id, user_password
+    	from IKEP4_VW_EP_USER
+    	where  user_id = #{user_id}
+    </select>
+    
+    <select id="getSSOEpUser" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+    	select user_id
+    	from IKEP4_VW_EP_USER
+    	where  user_id = #{user_id}
+    	and emp_no = #{emp_no}
+    </select>
+    
+    <select id="getHrUser" parameterType="java.util.HashMap" resultType="int">
+     	<![CDATA[
+     		SELECT COUNT(*) AS CNT
+     		  FROM REC_USER_INFO
+     		 WHERE USER_ID = #{user_id}
+     	]]>
+     </select>
+     
+     <select id="getHrUserInfo" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+     	<![CDATA[
+     		SELECT 
+     		USER_ID
+			,EMP_NO
+			,USER_NAME
+			,JOB_TITLE
+			,WORK_PLACE
+			,GROUP_NAME
+			,USER_AUTH
+			,(SELECT NAME FROM REC_CODE WHERE SUBSTRING(CODE, 1, 2)='90' AND CODE=A.USER_AUTH) AS AUTH_NAME
+			,USE_YN
+			,EV_ROLE_1
+			,EV_ROLE_2
+			,EV_ROLE_3
+			,EV_ROLE_4
+			,EV_ROLE_5
+			,REG_ID
+			,REG_DT
+			,MOD_ID
+			,MOD_DT
+     		FROM REC_USER_INFO AS A
+     		WHERE USER_ID = #{user_id}
+     	]]>
+     </select>
+     
+     <select id="selectHrMember" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+     	select * from (
+     	select ROW_NUMBER() OVER(ORDER BY REG_DT DESC) as ROW,
+     	USER_ID
+		,EMP_NO
+		,USER_NAME
+		,JOB_TITLE
+		,WORK_PLACE
+		,GROUP_NAME
+		,USER_AUTH
+		,(SELECT NAME FROM REC_CODE WHERE SUBSTRING(CODE, 1, 2)='90' AND CODE=A.USER_AUTH) AS AUTH_NAME
+		,USE_YN
+		,EV_ROLE_1
+		,EV_ROLE_2
+		,EV_ROLE_3
+		,EV_ROLE_4
+		,EV_ROLE_5
+		,REG_ID
+		,REG_DT
+		,MOD_ID
+		,MOD_DT
+     	from REC_USER_INFO AS A
+     	where 1=1
+     	<if test="searchType eq 'EV'.toString()">
+     		AND USER_AUTH = '90003'
+     	</if>
+     	) as T
+     	<if test="searchType neq 'EV'.toString()">
+     	where ROW between #{firstIndex} and #{lastIndex}	
+     	</if>
+     	
+     </select>
+
+     <select id="countHrMember" parameterType="java.util.HashMap" resultType="java.lang.Integer">
+     	select count(*) from REC_USER_INFO
+     	where 1=1
+     	<if test="searchType eq 'EV'.toString()">
+     		AND USER_AUTH = '90003'
+     	</if>
+     </select>
+     
+     <select id="selectEpMember" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+     	select top 10
+     	USER_ID
+		,EMP_NO
+		,USER_NAME
+		,GROUP_NAME
+		,JOB_DUTY_NAME
+		,JOB_TITLE_NAME
+		,WORK_PLACE_NAME
+     	from IKEP4_VW_EP_USER
+     	where 1=1
+     	<if test="searchType eq '1'.toString() and SKEY_1 != '' and SKEY_1 != null">
+     		AND USER_NAME like  '%'+#{SKEY_1}+'%'
+     	</if>
+     	<if test="searchType eq '2'.toString() and SKEY_1 != '' and SKEY_1 != null">
+     		AND WORK_PLACE_NAME like  '%'+#{SKEY_1}+'%'
+     	</if>
+     	<if test="searchType eq '3'.toString() and SKEY_1 != '' and SKEY_1 != null">
+     		AND GROUP_NAME like  '%'+#{SKEY_1}+'%'
+     	</if>
+     	<if test="searchType eq '4'.toString() and SKEY_1 != '' and SKEY_1 != null">
+     		AND JOB_DUTY_NAME like  '%'+#{SKEY_1}+'%'
+     	</if>
+     </select>
+	
+	<select id="countEpMember" parameterType="java.util.HashMap" resultType="java.lang.Integer">
+     	select 
+     	count(USER_ID) as CNT
+     	from IKEP4_VW_EP_USER
+     	where 1=1
+     	<if test="searchType eq '1'.toString() and SKEY_1 != '' and SKEY_1 != null">
+     		AND USER_NAME like  '%'+#{SKEY_1}+'%'
+     	</if>
+     	<if test="searchType eq '2'.toString() and SKEY_1 != '' and SKEY_1 != null">
+     		AND WORK_PLACE_NAME like  '%'+#{SKEY_1}+'%'
+     	</if>
+     	<if test="searchType eq '3'.toString() and SKEY_1 != '' and SKEY_1 != null">
+     		AND GROUP_NAME like  '%'+#{SKEY_1}+'%'
+     	</if>
+     	<if test="searchType eq '4'.toString() and SKEY_1 != '' and SKEY_1 != null">
+     		AND JOB_DUTY_NAME like  '%'+#{SKEY_1}+'%'
+     	</if>
+     </select>
+     
+     <select id="existHrMember" parameterType="com.moorim.hr.admin.vo.MemberVO" resultType="java.lang.Integer">
+     	select 
+     	count(USER_ID) as CNT
+     	from REC_USER_INFO
+     	where USER_ID = #{user_id}
+     </select>
+     <insert id="insertHrMember" parameterType="com.moorim.hr.admin.vo.MemberVO">
+     	<![CDATA[
+     		INSERT INTO REC_USER_INFO (
+     			USER_ID
+	        	,EMP_NO
+	        	,USER_NAME
+	        	,JOB_TITLE
+	        	,WORK_PLACE
+	        	,GROUP_NAME
+	            ,USER_AUTH
+	            ,USE_YN
+	            ,REG_ID
+	            ,REG_DT
+     		) VALUES (
+     			#{user_id},
+     			#{emp_no},
+     			#{user_name},
+     			#{job_title},
+     			#{work_place},
+     			#{group_name},
+     			#{user_auth},
+     			'Y',
+     			#{reg_id},
+     			GETDATE()
+     		)
+     	]]>
+     </insert>
+     <update id="updateHrMember" parameterType="com.moorim.hr.admin.vo.MemberVO">
+     	<![CDATA[
+     		UPDATE REC_USER_INFO
+     		SET 
+     		USER_AUTH=#{user_auth}
+     		,USE_YN=#{use_yn}
+     		,EV_ROLE_1=#{ev_role_1}
+     		,EV_ROLE_2=#{ev_role_2}
+     		,EV_ROLE_3=#{ev_role_3}
+     		,EV_ROLE_4=#{ev_role_4}
+     		,EV_ROLE_5=#{ev_role_5}
+     		, MOD_ID=#{mod_id}
+     		, MOD_DT=GETDATE()
+     		WHERE USER_ID=#{user_id}
+     		
+     	]]>
+     </update>
+     <delete id="deleteHrMember" parameterType="com.moorim.hr.admin.vo.MemberVO">
+     	<![CDATA[
+     		DELETE FROM REC_USER_INFO
+     		 WHERE USER_ID = #{user_id}
+     	]]>
+     </delete>
+    
+</mapper>

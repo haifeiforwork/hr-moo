@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+    http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+    http://www.springframework.org/schema/context  http://www.springframework.org/schema/jdbc/spring-context-3.0.xsd">
+
+	<bean id="sqlSession_hr" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource_hr" />
+        <property name="mapperLocations" value="classpath*:/mapper/**/*_SQL.xml" />
+    </bean>
+     
+    <bean id="sqlSessionTemplate_hr" class="org.mybatis.spring.SqlSessionTemplate">
+        <constructor-arg index="0" ref="sqlSession_hr"/>
+    </bean>
+
+	<bean id="sqlSession_sms" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource_sms" />
+        <property name="mapperLocations" value="classpath*:/mapper/**/*_SQL.xml" />
+    </bean>
+     
+    <bean id="sqlSessionTemplate_sms" class="org.mybatis.spring.SqlSessionTemplate">
+        <constructor-arg index="0" ref="sqlSession_sms"/>
+    </bean>
+    
+    <bean id="sqlSession_ep" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource_ep" />
+        <property name="mapperLocations" value="classpath*:/mapper/**/*_SQL.xml" />
+    </bean>
+     
+    <bean id="sqlSessionTemplate_ep" class="org.mybatis.spring.SqlSessionTemplate">
+        <constructor-arg index="0" ref="sqlSession_ep"/>
+    </bean>
+     
+</beans>
+

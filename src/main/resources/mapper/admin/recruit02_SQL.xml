@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="admin.rec0200">
+	
+	<select id="selectHrUser0200" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+     	<![CDATA[
+     		SELECT 
+     		USER_ID
+			,EMP_NO
+			,USER_NAME
+			,JOB_TITLE
+			,WORK_PLACE
+			,GROUP_NAME
+			,USER_AUTH
+			,(SELECT NAME FROM REC_CODE WHERE SUBSTRING(CODE, 1, 2)='90' AND CODE=A.USER_AUTH) AS AUTH_NAME
+			,USE_YN
+			,REG_ID
+			,REG_DT
+			,MOD_ID
+			,MOD_DT
+     		FROM REC_USER_INFO AS A
+     		WHERE 1=1
+     	]]>	
+    	<if test="searchType eq '1'.toString() and SKEY_1 != '' and SKEY_1 != null">
+     		AND USER_NAME like  CONCAT('%',#{SKEY_1},'%')
+     	</if>
+     	<if test="searchType eq '2'.toString() and SKEY_1 != '' and SKEY_1 != null">
+     		AND WORK_PLACE like  CONCAT('%',#{SKEY_1},'%')
+     	</if>
+     	<if test="searchType eq '3'.toString() and SKEY_1 != '' and SKEY_1 != null">
+     		AND GROUP_NAME like  CONCAT('%',#{SKEY_1},'%')
+     	</if>
+     	<if test="searchType eq '4'.toString() and SKEY_1 != '' and SKEY_1 != null">
+     		AND JOB_TITLE like  CONCAT('%',#{SKEY_1},'%')
+     	</if>
+    	
+     </select>
+     <select id="countHrUser0200" parameterType="java.util.HashMap" resultType="java.lang.Integer">
+   		SELECT 
+   		count(user_id) from REC_USER_INFO  
+   		WHERE 1=1
+   		<if test="searchType eq '1'.toString() and SKEY_1 != '' and SKEY_1 != null">
+    		AND USER_NAME like  CONCAT('%',#{SKEY_1},'%')
+     	</if>
+     	<if test="searchType eq '2'.toString() and SKEY_1 != '' and SKEY_1 != null">
+     		AND WORK_PLACE like  CONCAT('%',#{SKEY_1},'%')
+     	</if>
+     	<if test="searchType eq '3'.toString() and SKEY_1 != '' and SKEY_1 != null">
+     		AND GROUP_NAME like  CONCAT('%',#{SKEY_1},'%')
+     	</if>
+     	<if test="searchType eq '4'.toString() and SKEY_1 != '' and SKEY_1 != null">
+     		AND JOB_TITLE like  CONCAT('%',#{SKEY_1},'%')
+     	</if>
+     </select>
+   
+</mapper>

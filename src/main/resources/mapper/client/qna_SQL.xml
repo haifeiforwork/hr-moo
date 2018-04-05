@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="qna">
+	<select id="selectQnaList" parameterType="hashmap" resultType="hashmap">
+     	select * from (
+     	select ROW_NUMBER() OVER(ORDER BY IDX DESC) as ROW,
+     	*
+     	from REC_QNA
+     	where 1=1
+     	and DEL_YN='N'
+     	<if test="searchType eq '1'.toString() and SKEY_1 != '' and SKEY_1 != null">
+     		AND TITLE like  CONCAT('%',#{SKEY_1},'%')
+     	</if>
+     	<if test="searchType eq '2'.toString() and SKEY_1 != '' and SKEY_1 != null">
+     		AND REG_NAME like  CONCAT('%',#{SKEY_1},'%')
+     	</if>
+     	<if test="searchType eq '3'.toString() and SKEY_1 != '' and SKEY_1 != null">
+     		AND CONTENT_Q like  CONCAT('%',#{SKEY_1},'%')
+     	</if>
+     	) as T
+     	where ROW between #{firstIndex} and #{lastIndex}
+     </select>
+     
+	<select id="selectQnaCount" parameterType="java.util.HashMap" resultType="java.lang.Integer">
+     	select count(*) from REC_QNA
+     	where 1=1
+     	and DEL_YN='N'
+     	<if test="searchType eq '1'.toString() and SKEY_1 != '' and SKEY_1 != null">
+     		AND TITLE like  CONCAT('%',#{SKEY_1},'%')
+     	</if>
+     	<if test="searchType eq '2'.toString() and SKEY_1 != '' and SKEY_1 != null">
+     		AND REG_NAME like  CONCAT('%',#{SKEY_1},'%')
+     	</if>
+     	<if test="searchType eq '3'.toString() and SKEY_1 != '' and SKEY_1 != null">
+     		AND CONTENT_Q like  CONCAT('%',#{SKEY_1},'%')
+     	</if>
+     </select>
+     
+     <select id="selectQnaPwd" parameterType="java.util.HashMap" resultType="java.lang.Integer">
+     	select count(*) from REC_QNA
+		WHERE IDX = #{IDX}
+     	and REG_PW=${REG_PW}
+     </select>
+     
+     
+     <select id="detailQna" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+     	select * from REC_QNA
+     	where idx = ${idx}
+     </select>
+     
+     <insert id="insertQna" parameterType="java.util.HashMap" >
+     	insert into REC_QNA 
+     	(TITLE, CONTENT_Q, ATT_FILE, HIT_CNT, DEL_YN, LOCK_YN, REG_NAME, REG_PHONE,  REG_EMAIL, REG_PW, REG_DT, STATUS)
+     	values
+     	( #{TITLE}, #{CONTENT_Q}, #{fileinfo}, 0, 'N',  #{LOCK_YN}, #{REG_NAME}, #{REG_PHONE},  #{REG_EMAIL}, #{REG_PW}, getdate(), 1 )
+     </insert>
+     
+     <delete id="deleteQna" parameterType="java.util.HashMap" >
+     	delete from REC_QNA where idx = #{idx}
+     </delete>
+     
+     <update id="updateViewCount" parameterType="java.util.HashMap" >
+     	update REC_QNA set
+     	HIT_CNT = HIT_CNT+1
+     	where idx = #{IDX}
+     </update>
+     
+     
+     <update id="updateQna" parameterType="java.util.HashMap" >
+     	update REC_QNA set
+     	TITLE = #{TITLE} ,
+     	CONTENT_Q = #{CONTENT_Q},
+     	ATT_FILE =  #{fileinfo},
+     	REG_NAME = #{REG_NAME}, 
+     	REG_PHONE = #{REG_PHONE}, 
+     	REG_EMAIL = #{REG_EMAIL}
+     	where idx = #{IDX}
+     </update>
+     
+     <update id="updateViewQna" parameterType="java.util.HashMap" >
+     	update REC_QNA set
+     	HIT_CNT = HIT_CNT+1
+     	where idx = #{idx}
+     </update>
+     
+     
+     <update id="answerQna" parameterType="java.util.HashMap" >
+     	update REC_QNA set
+     	MOD_ID = #{MOD_ID} ,
+     	MOD_NAME = #{MOD_NAME} ,
+     	CONTENT_A = #{CONTENT_A} ,
+     	STATUS = 2
+     	where idx = #{IDX}
+     </update>
+     
+     
+   
+   
+</mapper>

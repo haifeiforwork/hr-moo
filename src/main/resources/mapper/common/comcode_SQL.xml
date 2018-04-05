@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="code">
+     
+     <select id="getCodeByGroup" parameterType="string" resultType="hashmap">
+     	<![CDATA[
+			SELECT code, name, expr
+			FROM REC_CODE
+			WHERE SUBSTRING(CODE, 1, 2) = #{G_CODE}
+		]]>
+     </select>
+     
+     <select id="getCodeSearchByGroup" parameterType="hashmap" resultType="hashmap">
+     	<![CDATA[
+			SELECT code, name 
+			FROM REC_CODE
+			WHERE SUBSTRING(CODE, 1, 2) = #{G_CODE}
+			AND NAME LIKE '%' + #{SEARCH_TXT} + '%'
+		]]>
+     </select>
+   
+</mapper>

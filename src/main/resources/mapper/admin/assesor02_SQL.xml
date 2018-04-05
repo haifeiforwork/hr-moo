@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="admin.assesor02">
+
+	<select id="selectDoc0201list" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+		<![CDATA[
+	     	SELECT * 
+	     	  FROM (
+	     	  		SELECT ROW_NUMBER() OVER(ORDER BY A.REG_DT DESC)                     AS ROW 
+			             , A.R_AP_CODE
+			             , A.R_IDX
+			             , A.R_NAME
+			             , A.R_PWD
+			             , A.R_GUBUN
+			             , (SELECT NAME FROM REC_CODE WHERE SUBSTRING(CODE, 1, 2) = '40' AND CODE = A.R_GUBUN) AS R_GUBUN_NM
+			             , A.R_PHOTO
+			             , A.R_HNAME
+			             , A.R_ENAME
+			             , A.R_BIRTH
+			             , A.R_BIRTH_CODE
+			             , A.R_AGE
+			             , A.R_SEX_CODE
+			             , A.R_JOB_KIND_CODE1
+			             , (SELECT NAME FROM REC_CODE WHERE SUBSTRING(CODE, 1, 2) = '03' AND CODE = A.R_JOB_KIND_CODE1) AS R_JOB_KIND_CODE1_NM
+			             , A.R_JOB_PART_CODE1
+			             , (SELECT NAME FROM REC_CODE WHERE SUBSTRING(CODE, 1, 2) = '04' AND CODE = A.R_JOB_PART_CODE1) AS R_JOB_PART_CODE1_NM
+			             , A.R_JOB_AREA_CODE1
+			             , (SELECT NAME FROM REC_CODE WHERE SUBSTRING(CODE, 1, 2) = '05' AND CODE = A.R_JOB_AREA_CODE1) AS R_JOB_AREA_CODE1_NM
+			             , A.R_JOB_KIND_CODE2
+			             , (SELECT NAME FROM REC_CODE WHERE SUBSTRING(CODE, 1, 2) = '03' AND CODE = A.R_JOB_KIND_CODE2) AS R_JOB_KIND_CODE2_NM
+			             , A.R_JOB_PART_CODE2
+			             , (SELECT NAME FROM REC_CODE WHERE SUBSTRING(CODE, 1, 2) = '04' AND CODE = A.R_JOB_PART_CODE2) AS R_JOB_PART_CODE2_NM
+			             , A.R_JOB_AREA_CODE2
+			             , (SELECT NAME FROM REC_CODE WHERE SUBSTRING(CODE, 1, 2) = '05' AND CODE = A.R_JOB_AREA_CODE2) AS R_JOB_AREA_CODE2_NM
+			             , A.R_POST
+			             , A.R_ADDR1
+			             , A.R_ADDR2
+			             , A.R_TEL
+			             , A.R_HP
+			             , A.R_EMAIL
+			             , A.R_RELIGION
+			             , A.R_SIGHT_LEFT
+			             , A.R_SIGHT_RIGHT
+			             , A.R_HOBBY
+			             , A.R_COLOR_CODE
+			             , A.R_HEIGHT
+			             , A.R_MARRY_CODE
+			             , A.R_WEIGHT
+			             , A.R_BOHUN_KIND
+			             , A.R_BOHUN_NUM
+			             , A.R_BOHUN_RELATION
+			             , A.R_ARMY_KIND
+			             , A.R_ARMY_TYPE
+			             , A.R_ARMY_BRANCH
+			             , A.R_ARMY_CLASS
+			             , A.R_ARMY_SDATE
+			             , A.R_ARMY_EDATE
+			             , A.R_ARMY_EXCEPT_REASON
+			             , A.R_STATUS_CODE
+			             , (SELECT NAME FROM REC_CODE WHERE SUBSTRING(CODE, 1, 2) = '50' AND CODE = A.R_STATUS_CODE) AS R_STATUS_CODE_NM
+			             , A.R_IP
+			             , A.REG_DT
+			             , A.MOD_DT
+			             , A.R_CONFIRM
+			             , A.ADM_ID
+			             , A.ADM_DT
+			             , A.ADM_DEL
+			         FROM REC_APPLY_MASTER A
+			        WHERE 1=1
+			          AND A.R_CONFIRM = 0
+	     			
+		]]>	       
+					<if test="SKEY_1 != '' and SKEY_1 != null">
+			     		AND A.R_IDX = #{SKEY_1}
+			     	</if>
+			     	<if test="SKEY_2 != '' and SKEY_2 != null">
+			     		AND A.R_STATUS_CODE = #{SKEY_2}
+			     	</if>
+					
+		<![CDATA[   
+		  	
+			     	) AS T
+	     	   WHERE 1=1
+	     	     AND ROW BETWEEN #{firstIndex} and #{lastIndex}
+     	]]>	     
+     </select>
+     
+	<select id="selectDoc0201count" parameterType="java.util.HashMap" resultType="java.lang.Integer">
+		<![CDATA[
+     		SELECT COUNT(*)
+		      FROM REC_APPLY_MASTER A
+		     WHERE 1=1
+		       AND A.R_CONFIRM = 0
+	    ]]>
+	    	<if test="SKEY_1 != '' and SKEY_1 != null">
+	     		AND A.R_IDX = #{SKEY_1}
+	     	</if>
+	     	<if test="SKEY_2 != '' and SKEY_2 != null">
+	     		AND A.R_STATUS_CODE = #{SKEY_2}
+	     	</if>
+	     	
+     </select>
+     
+     <select id="selectDoc0201PopIntro" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+		<![CDATA[
+	       SELECT A.IDX
+				, A.ITEM_CAT
+				, A.ITEM_TITLE
+				, A.ITEM_DESC
+				, A.PRIOR_NEW
+				, A.PRIOR_CAREER
+				, B.R_AP_CODE
+				, B.R_IDX
+				, B.I_SEQ
+				, B.I_CODE
+				, B.I_DESC
+		     FROM REC_ITEM_INTRO A 
+		     LEFT OUTER JOIN REC_APPLY_INTRODUCTION B 
+		       ON A.IDX = B.I_CODE
+		      AND B.R_AP_CODE = #{rApCode} 
+			  AND B.R_IDX = #{rIdx}
+		    WHERE 1=1
+	 	      
+     	]]>	     
+     </select>
+     <select id="selectDoc0201PopItem" parameterType="java.lang.String" resultType="java.util.HashMap">
+		<![CDATA[
+	     	SELECT IDX
+			     , E_STEP_CODE
+				 , ITEM_INDEX
+				 , E_ITEM
+				 , E_CONTENT
+			 FROM REC_EVAL_ITEM 
+			WHERE 1=1 
+			 AND E_STEP_CODE = '51010'
+			 AND ITEM_INDEX = #{idx}
+		   ORDER BY ITEM_INDEX
+     	]]>	     
+     </select>
+     
+     
+     
+
+
+
+
+	
+     
+</mapper>

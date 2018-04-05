@@ -1,0 +1,1036 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="job">
+	<select id="selectTopJobList" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+		<![CDATA[
+	     	SELECT  IDX,
+	     			R_TITLE,
+	     			R_GUBUN,
+	     			(SELECT NAME FROM REC_CODE WHERE SUBSTRING(CODE, 1, 2) = '40' AND CODE = R_GUBUN) AS R_GUBUN_TXT,
+	     			R_SDATE,
+	     			R_EDATE,
+	     			R_SDATE_TIME,
+	     			R_EDATE_TIME,
+	     			CASE
+						WHEN GETDATE() > CONVERT(DATETIME, R_EDATE + ' ' + R_EDATE_TIME + ':00:00') THEN '3'
+						WHEN GETDATE() < CONVERT(DATETIME, R_SDATE + ' ' + R_SDATE_TIME + ':00:00') THEN '1'
+						ELSE '2'
+					END AS JOB_STATUS,
+					CASE
+						WHEN GETDATE() > CONVERT(DATETIME, R_EDATE + ' ' + R_EDATE_TIME + ':00:00') THEN '마감'
+						WHEN GETDATE() < CONVERT(DATETIME, R_SDATE + ' ' + R_SDATE_TIME + ':00:00') THEN '예정'
+						ELSE '진행중'
+					END AS JOB_STATUS_TXT
+	     	FROM REC_NOTICE
+	     	WHERE 1=1
+	     	  AND R_SHOW_YN = 'Y'
+	     	  AND R_TOP_YN = 'Y'
+		]]>
+     </select>
+
+	<select id="selectJobList" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+		<![CDATA[
+	     	SELECT * FROM (
+		     	SELECT  ROW_NUMBER() OVER(ORDER BY R_SDATE DESC) AS ROW,
+		     			IDX,
+		     			R_TITLE,
+		     			R_GUBUN,
+		     			(SELECT NAME FROM REC_CODE WHERE SUBSTRING(CODE, 1, 2) = '40' AND CODE = R_GUBUN) AS R_GUBUN_TXT,
+		     			R_SDATE,
+		     			R_EDATE,
+		     			R_SDATE_TIME,
+		     			R_EDATE_TIME,
+		     			CASE
+							WHEN GETDATE() > CONVERT(DATETIME, R_EDATE + ' ' + R_EDATE_TIME + ':00:00') THEN '3'
+							WHEN GETDATE() < CONVERT(DATETIME, R_SDATE + ' ' + R_SDATE_TIME + ':00:00') THEN '1'
+							ELSE '2'
+						END AS JOB_STATUS,
+						CASE
+							WHEN GETDATE() > CONVERT(DATETIME, R_EDATE + ' ' + R_EDATE_TIME + ':00:00') THEN '마감'
+							WHEN GETDATE() < CONVERT(DATETIME, R_SDATE + ' ' + R_SDATE_TIME + ':00:00') THEN '예정'
+							ELSE '진행중'
+						END AS JOB_STATUS_TXT
+		     	FROM REC_NOTICE
+		     	WHERE 1=1
+		     	  AND R_SHOW_YN = 'Y'
+		]]>
+		<if test="searchType != null and searchType != 'ALL'">
+			<![CDATA[
+		     	  AND R_GUBUN = #{searchType}
+			]]>
+		</if>
+		<if test="SKEY_1 != null and SKEY_1 != ''">
+			<![CDATA[
+		     	  AND R_TITLE LIKE '%' + #{SKEY_1} + '%'
+		    ]]>
+		</if>
+		<![CDATA[
+	     	) AS T
+	     	WHERE ROW BETWEEN #{firstIndex} AND #{lastIndex}
+     	]]>
+     </select>
+
+	<select id="selectJobCount" parameterType="java.util.HashMap" resultType="java.lang.Integer">
+     	<![CDATA[
+	     	SELECT COUNT(*)
+	     	FROM REC_NOTICE
+	     	WHERE 1=1
+	     	  AND R_SHOW_YN = 'Y'
+		]]>
+		<if test="searchType != null and searchType != 'ALL'">
+			<![CDATA[
+	     	  AND R_GUBUN = #{searchType}
+			]]>
+		</if>
+		<if test="SKEY_1 != null and SKEY_1 != ''">
+			<![CDATA[
+	     	  AND R_TITLE LIKE '%' + #{SKEY_1} + '%'
+		    ]]>
+		</if>
+     </select>
+
+     <update id="updateHit" parameterType="java.util.HashMap">
+     	<![CDATA[
+     		UPDATE REC_NOTICE
+     		   SET R_HIT = R_HIT + 1
+     		 WHERE IDX = #{idx}
+     	]]>
+     </update>
+
+     <select id="selectJobDetail" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+     	<![CDATA[
+	     	SELECT  IDX,
+	     			R_TITLE,
+	     			R_CONTENT ,
+	     			R_GUBUN,
+		     		(SELECT NAME FROM REC_CODE WHERE SUBSTRING(CODE, 1, 2) = '40' AND CODE = R_GUBUN) AS R_GUBUN_TXT,
+	     			R_SDATE,
+	     			R_EDATE,
+	     			R_SDATE_TIME,
+	     			R_EDATE_TIME,
+	     			CASE
+						WHEN GETDATE() > CONVERT(DATETIME, R_EDATE + ' ' + R_EDATE_TIME + ':00:00') THEN '3'
+						WHEN GETDATE() < CONVERT(DATETIME, R_SDATE + ' ' + R_SDATE_TIME + ':00:00') THEN '1'
+						ELSE '2'
+					END AS JOB_STATUS,
+					CASE
+						WHEN GETDATE() > CONVERT(DATETIME, R_EDATE + ' ' + R_EDATE_TIME + ':00:00') THEN '마감'
+						WHEN GETDATE() < CONVERT(DATETIME, R_SDATE + ' ' + R_SDATE_TIME + ':00:00') THEN '예정'
+						ELSE '진행중'
+					END AS JOB_STATUS_TXT,
+					R_SAVE_FILE,
+					R_REAL_FILE
+	     	FROM REC_NOTICE
+	     	WHERE 1=1
+	     	  AND IDX = #{idx}
+     	]]>
+     </select>
+
+     <select id="selectApplyCode" parameterType="java.util.HashMap" resultType="String">
+     	<![CDATA[
+     		SELECT R_AP_CODE
+     		  FROM REC_APPLY_MASTER
+     		 WHERE R_IDX = #{rIdx}
+     		   AND R_NAME = #{rName}
+     		   AND R_BIRTH = #{rBirth}
+     		   AND R_PWD = #{rPwd}
+     		]]>
+     		<if test="rGubun != null and rGubun != ''">
+     			AND R_GUBUN = #{rGubun}
+     		</if>
+     </select>
+
+     <select id="selectCheckReg" parameterType="java.util.HashMap" resultType="int">
+     	<![CDATA[
+     		SELECT COUNT(*) AS REG_COUNT
+     		  FROM REC_APPLY_MASTER
+     		 WHERE R_IDX = #{rIdx}
+     		   AND R_NAME = #{rName}
+     		   AND R_BIRTH = #{rBirth}
+     		]]>
+     		<if test="rGubun != null and rGubun != ''">
+     			AND R_GUBUN = #{rGubun}
+     		</if>
+     		<if test="rEmail != null and rEmail != ''">
+     			AND R_EMAIL = #{rEmail}
+     		</if>
+     		<if test="rApCode != null and rApCode != ''">
+     		AND R_AP_CODE = #{rApCode}
+     		</if>
+     </select>
+
+     <select id="selectRecApplyMaster" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+     	<![CDATA[
+     		SELECT  R_AP_CODE
+     				, R_IDX
+     				, R_NAME
+     				, R_PWD
+     				, R_GUBUN
+     				, R_PHOTO
+     				, R_HNAME
+     				, R_ENAME
+     				, R_BIRTH
+     				, R_BIRTH_CODE
+     				, R_AGE
+     				, R_SEX_CODE
+     				, R_JOB_KIND_CODE1
+     				, R_JOB_PART_CODE1
+     				, R_JOB_AREA_CODE1
+     				, R_JOB_KIND_CODE2
+     				, R_JOB_PART_CODE2
+     				, R_JOB_AREA_CODE2
+     				, R_POST
+     				, R_ADDR1
+     				, R_ADDR2
+     				, R_TEL
+     				, R_HP
+     				, R_EMAIL
+     				, R_BOHUN_KIND
+     				, R_BOHUN_NUM
+     				, R_BOHUN_RELATION
+     				, R_ARMY_KIND
+     				, R_ARMY_TYPE
+     				, R_ARMY_BRANCH
+     				, R_ARMY_CLASS
+     				, R_ARMY_SDATE
+     				, R_ARMY_EDATE
+     				, R_ARMY_EXCEPT_REASON
+     				, R_STATUS_CODE
+     				, R_CONFIRM
+     		  FROM REC_APPLY_MASTER
+     		 WHERE R_AP_CODE = #{rApCode}
+     		   AND R_IDX = #{rIdx}
+     	]]>
+     </select>
+
+     <select id="getKindOptions" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+     	<![CDATA[
+     		SELECT 	T01.R_CODE1 AS CODE
+     				, T02.NAME AS NAME
+			  FROM REC_NOTICE_OPTION T01
+				INNER JOIN REC_CODE T02
+				   ON T01.R_CODE1 = T02.CODE
+			 WHERE T01.R_IDX = #{rIdx}
+			   AND SUBSTRING(T02.CODE, 1, 2) = '03'
+			 GROUP BY T01.R_CODE1, T02.NAME
+			 ORDER BY T01.R_CODE1
+     	]]>
+     </select>
+
+     <select id="getPartOptions" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+     	<![CDATA[
+     		SELECT 	T01.R_CODE2 AS CODE
+     				, T02.NAME AS NAME
+			  FROM REC_NOTICE_OPTION T01
+				INNER JOIN REC_CODE T02
+				   ON T01.R_CODE2 = T02.CODE
+			 WHERE T01.R_IDX = #{rIdx}
+			   AND SUBSTRING(T02.CODE, 1, 2) = '04'
+			   AND T01.R_CODE1 = #{rCode1}
+			 GROUP BY T01.R_CODE2, T02.NAME
+			 ORDER BY T01.R_CODE2
+     	]]>
+     </select>
+
+     <select id="getAreaOptions" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+     	<![CDATA[
+     		SELECT  T01.CODE AS CODE
+     				, T02.NAME AS NAME
+     		  FROM (
+				SELECT Split.a.value('.', 'VARCHAR(100)') AS CODE
+				  FROM (
+					SELECT CAST ('<M>' + REPLACE(R_CODE3, '|', '</M><M>') + '</M>' AS XML) AS R_CODE3
+					  FROM  REC_NOTICE_OPTION
+					 WHERE R_IDX = #{rIdx}
+					   AND R_CODE1 = #{rCode1}
+					   AND R_CODE2 = #{rCode2}
+				 ) AS A CROSS APPLY R_CODE3.nodes ('/M') AS Split(a)
+			  ) T01 INNER JOIN REC_CODE T02 ON T01.CODE = T02.CODE
+			 WHERE SUBSTRING(T02.CODE, 1, 2) = '05'
+     	]]>
+     </select>
+
+     <select id="selectApCode" parameterType="java.util.HashMap" resultType="String">
+     	<![CDATA[
+     		SELECT
+     				FORMAT(MAX(CONVERT(INT, ISNULL(R_AP_CODE, 0)) + 1), '00000') AS R_AP_CODE
+     		  FROM REC_APPLY_MASTER
+     		 WHERE R_IDX = #{rIdx}
+     	]]>
+     </select>
+
+     <insert id="insertApplyMaster" parameterType="java.util.HashMap">
+     	<selectKey keyProperty="rApCode" resultType="String" order="BEFORE">
+     		<![CDATA[
+     			SELECT
+	     				FORMAT(CONVERT(INT, ISNULL(MAX(R_AP_CODE), 0)) + 1, '00000') AS R_AP_CODE
+	     		  FROM REC_APPLY_MASTER
+	     		 WHERE R_IDX = #{rIdx}
+     		]]>
+     	</selectKey>
+     	<![CDATA[
+     		INSERT INTO REC_APPLY_MASTER (
+     			R_AP_CODE,
+				R_IDX,
+				R_NAME,
+				R_PWD,
+				R_GUBUN,
+				R_PHOTO,
+				R_HNAME,
+				R_ENAME,
+				R_BIRTH,
+				R_BIRTH_CODE,
+				R_AGE,
+				R_SEX_CODE,
+				R_JOB_KIND_CODE1,
+				R_JOB_PART_CODE1,
+				R_JOB_AREA_CODE1,
+				R_JOB_KIND_CODE2,
+				R_JOB_PART_CODE2,
+				R_JOB_AREA_CODE2,
+				R_POST,
+				R_ADDR1,
+				R_ADDR2,
+				R_TEL,
+				R_HP,
+				R_EMAIL,
+				R_BOHUN_KIND,
+				R_BOHUN_NUM,
+				R_BOHUN_RELATION,
+				R_ARMY_KIND,
+				R_ARMY_TYPE,
+				R_ARMY_BRANCH,
+				R_ARMY_CLASS,
+				R_ARMY_SDATE,
+				R_ARMY_EDATE,
+				R_ARMY_EXCEPT_REASON,
+				R_STATUS_CODE,
+				R_IP,
+				REG_DT,
+				MOD_DT
+     		) VALUES (
+     			#{rApCode},
+				#{rIdx},
+				#{rName},
+				#{rPwd},
+				#{rGubun},
+				#{rPhoto},
+				#{rHname},
+				#{rEname},
+				#{rBirth},
+				#{rBirthCode},
+				#{rAge},
+				#{rSexCode},
+				#{rJobKindCode1},
+				#{rJobPartCode1},
+				#{rJobAreaCode1},
+				#{rJobKindCode2},
+				#{rJobPartCode2},
+				#{rJobAreaCode2},
+				#{rPost},
+				#{rAddr1},
+				#{rAddr2},
+				#{rTel},
+				#{rHp},
+				#{rEmail},
+				#{rBohunKind},
+				#{rBohunNum},
+				#{rBohunRelation},
+				#{rArmyKind},
+				#{rArmyType},
+				#{rArmyBranch},
+				#{rArmyClass},
+				#{rArmySdate},
+				#{rArmyEdate},
+				#{rArmyExceptReason},
+				'50001',
+				#{rIp},
+     			GETDATE(),
+     			GETDATE()
+     		)
+     	]]>
+     </insert>
+
+     <update id="updateApplyMaster" parameterType="java.util.HashMap">
+     	<![CDATA[
+     		UPDATE REC_APPLY_MASTER SET
+     			R_GUBUN = #{rGubun},
+				R_PHOTO = #{rPhoto},
+				R_HNAME = #{rHname},
+				R_ENAME = #{rEname},
+				R_BIRTH_CODE = #{rBirthCode},
+				R_AGE = #{rAge},
+				R_SEX_CODE = #{rSexCode},
+				R_JOB_KIND_CODE1 = #{rJobKindCode1},
+				R_JOB_PART_CODE1 = #{rJobPartCode1},
+				R_JOB_AREA_CODE1 = #{rJobAreaCode1},
+				R_JOB_KIND_CODE2 = #{rJobKindCode2},
+				R_JOB_PART_CODE2 = #{rJobPartCode2},
+				R_JOB_AREA_CODE2 = #{rJobAreaCode2},
+				R_POST = #{rPost},
+				R_ADDR1 = #{rAddr1},
+				R_ADDR2 = #{rAddr2},
+				R_TEL = #{rTel},
+				R_HP = #{rHp},
+				R_EMAIL = #{rEmail},
+				R_BOHUN_KIND = #{rBohunKind},
+				R_BOHUN_NUM = #{rBohunNum},
+				R_BOHUN_RELATION = #{rBohunRelation},
+				R_ARMY_KIND = #{rArmyKind},
+				R_ARMY_TYPE = #{rArmyType},
+				R_ARMY_BRANCH = #{rArmyBranch},
+				R_ARMY_CLASS = #{rArmyClass},
+				R_ARMY_SDATE = #{rArmySdate},
+				R_ARMY_EDATE = #{rArmyEdate},
+				R_ARMY_EXCEPT_REASON = #{rArmyExceptReason},
+				R_IP = #{rIp},
+				MOD_DT = GETDATE()
+     		WHERE R_AP_CODE = #{rApCode}
+     		  AND R_IDX = #{rIdx}
+     	]]>
+     </update>
+
+     <select id="selectCheckSchoolReg" parameterType="java.util.HashMap" resultType="int">
+     	<![CDATA[
+     		SELECT COUNT(*) AS CNT
+     		  FROM REC_APPLY_SCHOOL
+     		 WHERE R_AP_CODE = #{rApCode}
+     		   AND R_IDX = #{rIdx}
+     	]]>
+     </select>
+
+     <select id="selectCheckGradeReg" parameterType="java.util.HashMap" resultType="int">
+     	<![CDATA[
+     		SELECT COUNT(*) AS CNT
+     		  FROM REC_APPLY_GRADE
+     		 WHERE R_AP_CODE = #{rApCode}
+     		   AND R_IDX = #{rIdx}
+     	]]>
+     </select>
+
+     <select id="selectSchoolList" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+		<![CDATA[
+	     	SELECT	R_AP_CODE
+	     			, R_IDX
+	     			, S_IDX
+	     			, S_NAME
+					, S_TYPE_CODE
+					, S_DN_CODE
+					, S_BP_CODE
+					, S_MAJOR
+					, S_MAJOR_CODE
+					, S_MAJOR_GROUP
+					, S_MAJOR_DETAIL
+					, S_MINOR
+					, S_MINOR_CODE
+					, S_MINOR_GROUP
+					, S_DUAL
+					, S_DUAL_CODE
+					, S_DUAL_GROUP
+					, S_ENT_MONTH
+					, S_GRA_MONTH
+					, S_GRA_TYPE
+	     	FROM REC_APPLY_SCHOOL
+	     	WHERE R_AP_CODE = #{rApCode}
+     		  AND R_IDX = #{rIdx}
+		]]>
+     </select>
+
+     <select id="selectGradeList" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+		<![CDATA[
+	     	SELECT	R_AP_CODE
+	     			, R_IDX
+	     			, S_IDX
+	     			, S_SCORE_11
+					, S_SCORE_12
+					, S_SCORE_21
+					, S_SCORE_22
+					, S_SCORE_31
+					, S_SCORE_32
+					, S_SCORE_41
+					, S_SCORE_42
+					, S_SCORE_51
+					, S_SCORE_52
+					, S_SCORE_61
+					, S_SCORE_62
+					, S_SCORE_AVG
+					, S_SCORE_FULL
+					, S_SCORE_FINAL
+					, S_THESIS1
+					, S_THESIS1_FILE
+					, S_THESIS2
+					, S_THESIS2_FILE
+	     	FROM REC_APPLY_GRADE
+	     	WHERE R_AP_CODE = #{rApCode}
+     		  AND R_IDX = #{rIdx}
+		]]>
+     </select>
+
+     <update id="mergeApplySchool" parameterType="java.util.HashMap">
+     	<![CDATA[
+     		MERGE REC_APPLY_SCHOOL RAS
+     		USING (select 'X' as DUAL) T
+     		   ON (RAS.R_AP_CODE = #{rApCode} AND RAS.R_IDX = #{rIdx} AND RAS.S_IDX = #{sIdx})
+     		WHEN MATCHED THEN
+	     		UPDATE
+	     			SET S_NAME = #{sName}
+						, S_TYPE_CODE = #{sTypeCode}
+						, S_DN_CODE = #{sDnCode}
+						, S_BP_CODE = #{sBpCode}
+						, S_MAJOR = #{sMajor}
+						, S_MAJOR_CODE = #{sMajorCode}
+						, S_MAJOR_GROUP = #{sMajorGroup}
+						, S_MAJOR_DETAIL = #{sMajorDetail}
+						, S_MINOR = #{sMinor}
+						, S_MINOR_CODE = #{sMinorCode}
+						, S_MINOR_GROUP = #{sMinorGroup}
+						, S_DUAL = #{sDual}
+						, S_DUAL_CODE = #{sDualCode}
+						, S_DUAL_GROUP = #{sDualGroup}
+						, S_ENT_MONTH = #{sEntMonth}
+						, S_GRA_MONTH = #{sGraMonth}
+						, S_GRA_TYPE = #{sGraType}
+			WHEN NOT MATCHED THEN
+	     		INSERT (
+		     		R_AP_CODE
+					, R_IDX
+					, S_IDX
+					, S_NAME
+					, S_TYPE_CODE
+					, S_DN_CODE
+					, S_BP_CODE
+					, S_MAJOR
+					, S_MAJOR_CODE
+					, S_MAJOR_GROUP
+					, S_MAJOR_DETAIL
+					, S_MINOR
+					, S_MINOR_CODE
+					, S_MINOR_GROUP
+					, S_DUAL
+					, S_DUAL_CODE
+					, S_DUAL_GROUP
+					, S_ENT_MONTH
+					, S_GRA_MONTH
+					, S_GRA_TYPE
+					, REG_DT
+				) VALUES (
+					#{rApCode}
+					, #{rIdx}
+					, #{sIdx}
+					, #{sName}
+					, #{sTypeCode}
+					, #{sDnCode}
+					, #{sBpCode}
+					, #{sMajor}
+					, #{sMajorCode}
+					, #{sMajorGroup}
+					, #{sMajorDetail}
+					, #{sMinor}
+					, #{sMinorCode}
+					, #{sMinorGroup}
+					, #{sDual}
+					, #{sDualCode}
+					, #{sDualGroup}
+					, #{sEntMonth}
+					, #{sGraMonth}
+					, #{sGraType}
+					, GETDATE()
+				);
+     	]]>
+     </update>
+
+     <update id="mergeApplyGrade" parameterType="java.util.HashMap">
+     	<![CDATA[
+     		MERGE REC_APPLY_GRADE RAG
+     		USING (select 'X' as DUAL) T
+     		   ON (RAG.R_AP_CODE = #{rApCode} AND RAG.R_IDX = #{rIdx} AND RAG.S_IDX = #{sIdx})
+     		WHEN MATCHED THEN
+	     		UPDATE SET
+	     			S_TYPE_CODE = #{sTypeCode}
+					, S_SCORE_11 = #{sScore11}
+					, S_SCORE_12 = #{sScore12}
+					, S_SCORE_21 = #{sScore21}
+					, S_SCORE_22 = #{sScore22}
+					, S_SCORE_31 = #{sScore31}
+					, S_SCORE_32 = #{sScore32}
+					, S_SCORE_41 = #{sScore41}
+					, S_SCORE_42 = #{sScore42}
+					, S_SCORE_51 = #{sScore51}
+					, S_SCORE_52 = #{sScore52}
+					, S_SCORE_61 = #{sScore61}
+					, S_SCORE_62 = #{sScore62}
+					, S_SCORE_AVG = #{sScoreAvg}
+					, S_SCORE_FULL = #{sScoreFull}
+					, S_SCORE_FINAL = #{sScoreFinal}
+					, S_THESIS1 = #{sThesis1}
+					, S_THESIS1_FILE = #{sThesis1File}
+					, S_THESIS2 = #{sThesis2}
+					, S_THESIS2_FILE = #{sThesis2File}
+			WHEN NOT MATCHED THEN
+	     		INSERT (
+		     		R_AP_CODE
+					, R_IDX
+					, S_IDX
+					, S_TYPE_CODE
+					, S_SCORE_11
+					, S_SCORE_12
+					, S_SCORE_21
+					, S_SCORE_22
+					, S_SCORE_31
+					, S_SCORE_32
+					, S_SCORE_41
+					, S_SCORE_42
+					, S_SCORE_51
+					, S_SCORE_52
+					, S_SCORE_61
+					, S_SCORE_62
+					, S_SCORE_AVG
+					, S_SCORE_FULL
+					, S_SCORE_FINAL
+					, S_THESIS1
+					, S_THESIS1_FILE
+					, S_THESIS2
+					, S_THESIS2_FILE
+					, REG_DT
+				) VALUES (
+					#{rApCode}
+					, #{rIdx}
+					, #{sIdx}
+					, #{sTypeCode}
+					, #{sScore11}
+					, #{sScore12}
+					, #{sScore21}
+					, #{sScore22}
+					, #{sScore31}
+					, #{sScore32}
+					, #{sScore41}
+					, #{sScore42}
+					, #{sScore51}
+					, #{sScore52}
+					, #{sScore61}
+					, #{sScore62}
+					, #{sScoreAvg}
+					, #{sScoreFull}
+					, #{sScoreFinal}
+					, #{sThesis1}
+					, #{sThesis1File}
+					, #{sThesis2}
+					, #{sThesis2File}
+					, GETDATE()
+				);
+     	]]>
+     </update>
+
+     <select id="selectCheckCareerReg" parameterType="java.util.HashMap" resultType="int">
+     	<![CDATA[
+     		SELECT COUNT(*) AS CNT
+     		  FROM REC_APPLY_CAREER
+     		 WHERE R_AP_CODE = #{rApCode}
+     		   AND R_IDX = #{rIdx}
+     	]]>
+     </select>
+
+     <select id="selectCareerList" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+		<![CDATA[
+	     	SELECT	R_AP_CODE
+	     			R_IDX,
+	     			C_SEQ,
+	     			C_NAME,
+	     			C_PART,
+	     			C_INCOME,
+	     			C_POSITION,
+	     			C_WORK,
+	     			C_SMONTH,
+	     			C_EMONTH,
+	     			C_PERFORM,
+	     			C_TYPE,
+	     			C_REL_YN,
+	     			C_REASON
+	     	FROM REC_APPLY_CAREER
+	     	WHERE R_AP_CODE = #{rApCode}
+     		  AND R_IDX = #{rIdx}
+     		ORDER BY C_SEQ
+		]]>
+     </select>
+
+     <select id="selectCheckTrainingReg" parameterType="java.util.HashMap" resultType="int">
+     	<![CDATA[
+     		SELECT COUNT(*) AS CNT
+     		  FROM REC_APPLY_TRAINING
+     		 WHERE R_AP_CODE = #{rApCode}
+     		   AND R_IDX = #{rIdx}
+     	]]>
+     </select>
+
+     <select id="selectTrainingList" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+		<![CDATA[
+	     	SELECT	R_AP_CODE
+	     			R_IDX,
+	     			T_SEQ,
+	     			T_GUBUN_CODE,
+	     			T_NAT_CODE,
+	     			T_INSTITUTION,
+	     			T_SDATE,
+	     			T_EDATE,
+	     			T_TERM
+	     	FROM REC_APPLY_TRAINING
+	     	WHERE R_AP_CODE = #{rApCode}
+     		  AND R_IDX = #{rIdx}
+     		ORDER BY T_SEQ
+		]]>
+     </select>
+
+     <select id="selectCheckLanguageReg" parameterType="java.util.HashMap" resultType="int">
+     	<![CDATA[
+     		SELECT COUNT(*) AS CNT
+     		  FROM REC_APPLY_LANGUAGE
+     		 WHERE R_AP_CODE = #{rApCode}
+     		   AND R_IDX = #{rIdx}
+     	]]>
+     </select>
+
+     <select id="selectLanguageList" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+		<![CDATA[
+	     	SELECT	R_AP_CODE
+	     			R_IDX,
+	     			L_SEQ,
+	     			L_LANGUAGE,
+	     			L_EXAM,
+	     			L_SCORE,
+	     			L_GRADE,
+	     			L_EDATE,
+	     			L_INSTIT
+	     	FROM REC_APPLY_LANGUAGE
+	     	WHERE R_AP_CODE = #{rApCode}
+     		  AND R_IDX = #{rIdx}
+     		ORDER BY L_SEQ
+		]]>
+     </select>
+
+     <select id="selectCheckCertReg" parameterType="java.util.HashMap" resultType="int">
+     	<![CDATA[
+     		SELECT COUNT(*) AS CNT
+     		  FROM REC_APPLY_CERT
+     		 WHERE R_AP_CODE = #{rApCode}
+     		   AND R_IDX = #{rIdx}
+     	]]>
+     </select>
+
+     <select id="selectCertList" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+		<![CDATA[
+	     	SELECT	R_AP_CODE
+	     			R_IDX,
+	     			C_SEQ,
+	     			C_NAME,
+	     			C_CODE,
+	     			C_GRADE,
+	     			C_EDATE,
+	     			C_INSTIT
+	     	FROM REC_APPLY_CERT
+	     	WHERE R_AP_CODE = #{rApCode}
+     		  AND R_IDX = #{rIdx}
+     		ORDER BY C_SEQ
+		]]>
+     </select>
+
+     <delete id="deleteApplyCareer" parameterType="java.util.HashMap">
+     	<![CDATA[
+     		DELETE FROM REC_APPLY_CAREER
+     		 WHERE R_AP_CODE = #{rApCode}
+     		   AND R_IDX = #{rIdx}
+     	]]>
+     </delete>
+
+     <insert id="insertApplyCareer" parameterType="java.util.HashMap">
+     	<![CDATA[
+     		INSERT INTO REC_APPLY_CAREER (
+     			R_AP_CODE,
+     			R_IDX,
+     			C_SEQ,
+     			C_NAME,
+     			C_PART,
+     			C_INCOME,
+     			C_POSITION,
+     			C_WORK,
+     			C_SMONTH,
+     			C_EMONTH,
+     			C_PERFORM,
+     			C_TYPE,
+     			C_REL_YN,
+     			C_REASON,
+     			REG_DT
+     		) VALUES (
+     			#{rApCode},
+     			#{rIdx},
+     			#{cSeq},
+     			#{cName},
+     			#{cPart},
+     			#{cIncome},
+     			#{cPosition},
+     			#{cWork},
+     			#{cSmonth},
+     			#{cEmonth},
+     			#{cPerform},
+     			#{cType},
+     			#{cRelYn},
+     			#{cReason},
+     			GETDATE()
+     		)
+     	]]>
+     </insert>
+
+     <delete id="deleteApplyTraining" parameterType="java.util.HashMap">
+     	<![CDATA[
+     		DELETE FROM REC_APPLY_TRAINING
+     		 WHERE R_AP_CODE = #{rApCode}
+     		   AND R_IDX = #{rIdx}
+     	]]>
+     </delete>
+
+     <insert id="insertApplyTraining" parameterType="java.util.HashMap">
+     	<![CDATA[
+     		INSERT INTO REC_APPLY_TRAINING (
+     			R_AP_CODE,
+     			R_IDX,
+     			T_SEQ,
+     			T_GUBUN_CODE,
+     			T_NAT_CODE,
+     			T_INSTITUTION,
+     			T_SDATE,
+     			T_EDATE,
+     			T_TERM,
+     			REG_DT
+     		) VALUES (
+     			#{rApCode},
+     			#{rIdx},
+     			#{tSeq},
+     			#{tGubunCode},
+     			#{tNatCode},
+     			#{tInstitution},
+     			#{tSdate},
+     			#{tEdate},
+     			#{tTerm},
+     			GETDATE()
+     		)
+     	]]>
+     </insert>
+
+     <delete id="deleteApplyLanguage" parameterType="java.util.HashMap">
+     	<![CDATA[
+     		DELETE FROM REC_APPLY_LANGUAGE
+     		 WHERE R_AP_CODE = #{rApCode}
+     		   AND R_IDX = #{rIdx}
+     	]]>
+     </delete>
+
+     <insert id="insertApplyLanguage" parameterType="java.util.HashMap">
+     	<![CDATA[
+     		INSERT INTO REC_APPLY_LANGUAGE (
+     			R_AP_CODE,
+     			R_IDX,
+     			L_SEQ,
+     			L_LANGUAGE,
+     			L_EXAM,
+     			L_SCORE,
+     			L_GRADE,
+     			L_EDATE,
+     			L_INSTIT,
+     			REG_DT
+     		) VALUES (
+     			#{rApCode},
+     			#{rIdx},
+     			#{lSeq},
+     			#{lLanguage},
+     			#{lExam},
+     			#{lScore},
+     			#{lGrade},
+     			#{lEdate},
+     			#{lInstit},
+     			GETDATE()
+     		)
+     	]]>
+     </insert>
+
+     <delete id="deleteApplyCert" parameterType="java.util.HashMap">
+     	<![CDATA[
+     		DELETE FROM REC_APPLY_CERT
+     		 WHERE R_AP_CODE = #{rApCode}
+     		   AND R_IDX = #{rIdx}
+     	]]>
+     </delete>
+
+     <insert id="insertApplyCert" parameterType="java.util.HashMap">
+     	<![CDATA[
+     		INSERT INTO REC_APPLY_CERT (
+     			R_AP_CODE,
+     			R_IDX,
+     			C_SEQ,
+     			C_NAME,
+     			C_CODE,
+     			C_GRADE,
+     			C_EDATE,
+     			C_INSTIT,
+     			REG_DT
+     		) VALUES (
+     			#{rApCode},
+     			#{rIdx},
+     			#{cSeq},
+     			#{cName},
+     			#{cCode},
+     			#{cGrade},
+     			#{cEdate},
+     			#{cInstit},
+     			GETDATE()
+     		)
+     	]]>
+     </insert>
+
+     <select id="selectIntroList" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+		<![CDATA[
+	     	SELECT	IDX,
+	     			ITEM_TITLE,
+	     			ITEM_DESC,
+	     			LENGTH_MIN,
+	     			LENGTH_MAX
+	     	FROM REC_ITEM_INTRO
+	     	WHERE 1=1
+	    ]]>
+	   	<if test="rGubun == '40001'">
+			<![CDATA[
+	     	  AND PRIOR_NEW IS NOT NULL
+	     	  ORDER BY PRIOR_NEW
+		    ]]>
+		</if>
+	   	<if test="rGubun == '40002'">
+			<![CDATA[
+	     	  AND PRIOR_CAREER IS NOT NULL
+	     	  ORDER BY PRIOR_CAREER
+		    ]]>
+		</if>
+     </select>
+
+     <select id="selectApplyKindNm" parameterType="java.util.HashMap" resultType="String">
+		<![CDATA[
+	     	SELECT T02.NAME AS JOB_KIND_CODE_NAME
+			  FROM REC_APPLY_MASTER T01
+			  	INNER JOIN REC_CODE T02
+			  	   ON T01.R_JOB_KIND_CODE1 = T02.CODE
+			WHERE T01.R_AP_CODE = #{rApCode}
+			AND T01.R_IDX = #{rIdx}
+			AND SUBSTRING(T02.CODE, 1, 2) = '03'
+		]]>
+     </select>
+
+     <select id="selectCheckApplyIntroReg" parameterType="java.util.HashMap" resultType="int">
+     	<![CDATA[
+     		SELECT COUNT(*) AS CNT
+     		  FROM REC_APPLY_INTRODUCTION
+     		 WHERE R_AP_CODE = #{rApCode}
+     		   AND R_IDX = #{rIdx}
+     	]]>
+     </select>
+
+     <select id="selectApplyIntroList" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+		<![CDATA[
+	     	SELECT	R_AP_CODE
+	     			R_IDX,
+	     			I_SEQ,
+	     			I_CODE,
+	     			I_DESC
+	     	FROM REC_APPLY_INTRODUCTION
+	     	WHERE R_AP_CODE = #{rApCode}
+     		  AND R_IDX = #{rIdx}
+     		ORDER BY I_SEQ
+		]]>
+     </select>
+
+     <update id="mergeApplyIntro" parameterType="java.util.HashMap">
+     	<![CDATA[
+     		MERGE REC_APPLY_INTRODUCTION RAI
+     		USING (select 'X' as DUAL) T
+     		   ON (RAI.R_AP_CODE = #{rApCode} AND RAI.R_IDX = #{rIdx} AND RAI.I_SEQ = #{iSeq})
+     		WHEN MATCHED THEN
+	     		UPDATE
+	     			SET I_CODE = #{iCode}
+						, I_DESC = #{iDesc}
+			WHEN NOT MATCHED THEN
+	     		INSERT (
+		     		R_AP_CODE
+					, R_IDX
+					, I_SEQ
+					, I_CODE
+					, I_DESC
+					, REG_DT
+				) VALUES (
+					#{rApCode}
+					, #{rIdx}
+					, #{iSeq}
+					, #{iCode}
+					, #{iDesc}
+					, GETDATE()
+				);
+     	]]>
+     </update>
+
+     <update id="updateStatus" parameterType="java.util.HashMap">
+     	<![CDATA[
+     		UPDATE REC_APPLY_MASTER
+     		   SET R_STATUS_CODE = '50002'
+     		   	   , MOD_DT = GETDATE()
+     		 WHERE R_AP_CODE = #{rApCode}
+     		   AND R_IDX = #{rIdx}
+     	]]>
+     </update>
+
+     <select id="selectApplyInfo" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+		<![CDATA[
+	     	SELECT T02.R_SNUM AS R_SNUM
+	     		   , T01.R_IDX AS R_IDX
+	     		   , T01.R_AP_CODE AS R_AP_CODE
+	     		   , T01.R_NAME AS R_NAME
+			  FROM REC_APPLY_MASTER T01
+			 INNER JOIN REC_NOTICE T02
+			    ON T01.R_IDX = T02.IDX
+			 WHERE T01.R_AP_CODE = #{rApCode}
+			   AND T01.R_IDX = #{rIdx}
+		]]>
+     </select>
+
+     <select id="selectCurrentNoticeList" resultType="java.util.HashMap">
+     	<![CDATA[
+     		SELECT IDX
+	     		   , R_TITLE
+	     	  FROM REC_NOTICE
+	         WHERE R_SHOW_YN = 'Y'
+	           AND GETDATE() BETWEEN CONVERT(DATETIME, R_SDATE + ' ' + R_SDATE_TIME + ':00:00') AND CONVERT(DATETIME, R_EDATE + ' ' + R_EDATE_TIME + ':00:00')
+	         ORDER BY IDX DESC
+     	]]>
+     </select>
+
+     <select id="appySelectOneInfo" resultType="java.util.HashMap">
+     	<![CDATA[
+     		SELECT R_AP_CODE
+				 , R_IDX
+				 , R_NAME
+				 , R_PWD
+				 , R_GUBUN
+				 , R_BIRTH
+				 , R_EMAIL
+				 , R_STATUS_CODE
+     		  FROM REC_APPLY_MASTER
+     		 WHERE R_IDX = #{rIdx}
+     		   AND R_NAME = #{rName}
+     		   AND R_BIRTH = #{rBirth}
+	      	   AND R_GUBUN = #{rGubun}
+     	]]>
+     		<if test="rEmail != null and rEmail != ''">
+     			AND R_EMAIL = #{rEmail}
+     		</if>
+     		<if test="rApCode != null and rApCode != ''">
+     		AND R_AP_CODE = #{rApCode}
+     		</if>
+     </select>
+
+
+
+</mapper>
